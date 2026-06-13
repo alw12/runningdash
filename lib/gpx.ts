@@ -18,25 +18,41 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-// Extract HR from a trkpt block via regex — handles all namespace formats:
-// <gpxtpx:hr>, <ns3:hr>, <http://...:hr>, etc.
-function extractHR(trkptBlock: string): number | undefined {
-  const m = trkptBlock.match(/:hr>(\d+)<\//)
-  return m ? parseInt(m[1]) : undefined
+// Extract HR values per trkpt from raw XML via regex.
+// Handles: <gpxtpx:hr>, <ns3:hr>, <http://...:hr>, <hr>
+function extractAllHR(rawXml: string): (number | undefined)[] {
+  const results: (number | undefined)[] = []
+  // Split on trkpt opening tags
+  const blocks = rawXml.split(/<trkpt[\s>]/)
+  blocks.shift() // first block is before any trkpt
+  for (const block of blocks) {
+    const m = block.match(/:hr>(\d+)<\/|<hr>(\d+)<\/hr>/)
+    results.push(m ? parseInt(m[1] ?? m[2]) : undefined)
+  }
+  return results
 }
 
-function parseTrkpt(el: Element, rawBlock: string): GpxPoint {
-  const lat = parseFloat(el.getAttribute('lat') ?? '0')
-  const lon = parseFloat(el.getAttribute('lon') ?? '0')
-  const eleEl = el.querySelector('ele')
-  const timeEl = el.querySelector('time')
-  return {
-    lat,
-    lon,
-    ele: eleEl ? parseFloat(eleEl.textContent ?? '0') : undefined,
-    time: timeEl?.textContent ? new Date(timeEl.textContent) : undefined,
-    hr: extractHR(rawBlock),
+// Extract track names from raw XML (avoids namespace issues)
+function extractTrackNames(rawXml: string): string[] {
+  const names: string[] = []
+  const trackBlocks = rawXml.split(/<trk[\s>]/)
+  trackBlocks.shift()
+  for (const block of trackBlocks) {
+    const m = block.match(/<name[^>]*>([\s\S]*?)<\/name>/)
+    names.push(m ? m[1].trim() : '')
   }
+  return names
+}
+
+// Count trkpt elements before each trk — used to align HR array index
+function countTrkptsBefore(rawXml: string, trackIndex: number): number {
+  const trackBlocks = rawXml.split(/<trk[\s>]/)
+  let count = 0
+  for (let i = 1; i <= trackIndex; i++) {
+    const block = trackBlocks[i] ?? ''
+    count += (block.match(/<trkpt[\s>]/g) ?? []).length
+  }
+  return count
 }
 
 function buildActivityFromPoints(
@@ -127,12 +143,13 @@ export function parseGpxFile(
   xml: string,
   filename: string
 ): { activity: Activity; stream: ActivityStream }[] {
-  // Remove the problematic full-URI namespace prefixes before parsing —
-  // gpxpy emits tags like <http://www.garmin.com/.../v1:hr> which is invalid XML.
-  // Replace them with a safe prefix so DOMParser doesn't choke.
-  const cleaned = xml
-    .replace(/<http:\/\/[^>]+:([a-zA-Z]+)>/g, '<gpxext:$1>')
-    .replace(/<\/http:\/\/[^>]+:([a-zA-Z]+)>/g, '</gpxext:$1>')
+  // Extract HR and track names from raw XML before any cleaning
+  const allHR = extractAllHR(xml)
+  const trackNames = extractTrackNames(xml)
+
+  // Strip <extensions>...</extensions> blocks so DOMParser never sees
+  // invalid namespace prefixes (gpxpy emits <http://...:tag> which is illegal XML)
+  const cleaned = xml.replace(/<extensions>[\s\S]*?<\/extensions>/g, '')
 
   const parser = new DOMParser()
   const doc = parser.parseFromString(cleaned, 'application/xml')
@@ -141,25 +158,30 @@ export function parseGpxFile(
   if (parseError) throw new Error('GPX non valido: ' + parseError.textContent?.slice(0, 100))
 
   const results: { activity: Activity; stream: ActivityStream }[] = []
-
-  // Split raw XML into per-trkpt blocks for regex HR extraction
-  const rawTrkpts = xml.split(/<trkpt\b/)
-
   const tracks = doc.querySelectorAll('trk')
-  let globalPtIndex = 0  // tracks position across all trkpt blocks
 
   tracks.forEach((trk, trackIdx) => {
     const name =
+      trackNames[trackIdx] ||
       trk.querySelector('name')?.textContent?.trim() ||
       filename.replace(/\.gpx$/i, '') + (tracks.length > 1 ? ` #${trackIdx + 1}` : '')
 
     const trkptEls = trk.querySelectorAll('trkpt')
+    const hrOffset = countTrkptsBefore(xml, trackIdx)
     const points: GpxPoint[] = []
 
-    trkptEls.forEach((el) => {
-      globalPtIndex++
-      const raw = globalPtIndex < rawTrkpts.length ? rawTrkpts[globalPtIndex] : ''
-      points.push(parseTrkpt(el, raw))
+    trkptEls.forEach((el, ptIdx) => {
+      const lat = parseFloat(el.getAttribute('lat') ?? '0')
+      const lon = parseFloat(el.getAttribute('lon') ?? '0')
+      const eleEl = el.querySelector('ele')
+      const timeEl = el.querySelector('time')
+      points.push({
+        lat,
+        lon,
+        ele: eleEl ? parseFloat(eleEl.textContent ?? '0') : undefined,
+        time: timeEl?.textContent ? new Date(timeEl.textContent) : undefined,
+        hr: allHR[hrOffset + ptIdx],
+      })
     })
 
     if (points.length < 2) return

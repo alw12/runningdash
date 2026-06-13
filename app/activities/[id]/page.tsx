@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Activity, ActivityStream } from '@/types'
-import { getActivities, getStream } from '@/lib/storage'
+import { getActivities, getStream, deleteActivity } from '@/lib/storage'
 import { StatCard } from '@/components/StatCard'
 import { ActivityChart } from '@/components/ActivityChart'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
@@ -34,6 +34,7 @@ export default function ActivityDetail() {
   const router = useRouter()
   const [activity, setActivity] = useState<Activity | null>(null)
   const [stream, setStream] = useState<ActivityStream | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     const all = getActivities()
@@ -52,15 +53,42 @@ export default function ActivityDetail() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <button
-          onClick={() => router.back()}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-3 flex items-center gap-1"
-        >
-          ← Indietro
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">{activity.name}</h1>
-        <p className="text-gray-400 text-sm mt-1">{formatDate(activity.date)}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <button
+            onClick={() => router.back()}
+            className="text-sm text-gray-500 hover:text-gray-700 mb-3 flex items-center gap-1"
+          >
+            ← Indietro
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">{activity.name}</h1>
+          <p className="text-gray-400 text-sm mt-1">{formatDate(activity.date)}</p>
+        </div>
+        <div className="flex items-center gap-2 mt-1">
+          {confirmDelete ? (
+            <>
+              <button
+                onClick={() => { deleteActivity(id); router.push('/activities') }}
+                className="text-sm bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600"
+              >
+                Conferma eliminazione
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Annulla
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+            >
+              Elimina
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

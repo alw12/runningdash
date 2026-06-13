@@ -26,6 +26,12 @@ export function getStream(activityId: string): ActivityStream | null {
   return raw ? JSON.parse(raw) : null
 }
 
+export function deleteActivity(id: string) {
+  const all = getActivities().filter((a) => a.id !== id)
+  saveActivities(all)
+  localStorage.removeItem(KEYS.STREAMS + id)
+}
+
 export function mergeActivities(existing: Activity[], incoming: Activity[]): Activity[] {
   const map = new Map(existing.map((a) => [a.id, a]))
   incoming.forEach((a) => map.set(a.id, a))

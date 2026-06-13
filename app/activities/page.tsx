@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Activity } from '@/types'
-import { getActivities } from '@/lib/storage'
+import { getActivities, deleteActivity } from '@/lib/storage'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
 
 type SortKey = 'date' | 'distance' | 'pace' | 'hr'
@@ -10,10 +10,17 @@ type SortKey = 'date' | 'distance' | 'pace' | 'hr'
 export default function ActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [sort, setSort] = useState<SortKey>('date')
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
   useEffect(() => {
     setActivities(getActivities())
   }, [])
+
+  function handleDelete(id: string) {
+    deleteActivity(id)
+    setActivities((prev) => prev.filter((a) => a.id !== id))
+    setConfirmDelete(null)
+  }
 
   const sorted = [...activities].sort((a, b) => {
     switch (sort) {
@@ -76,12 +83,13 @@ export default function ActivitiesPage() {
                 <th className="text-right px-4 py-3 font-medium text-gray-500">Passo</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">FC media</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">FC max</th>
-                <th className="text-right px-6 py-3 font-medium text-gray-500">Dislivello</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-500">Dislivello</th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {sorted.map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={a.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4">
                     <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-blue-600">
                       {a.name}
@@ -99,8 +107,34 @@ export default function ActivitiesPage() {
                   <td className="px-4 py-4 text-right text-gray-600">
                     {a.maxHeartRate ? Math.round(a.maxHeartRate) + ' bpm' : '—'}
                   </td>
-                  <td className="px-6 py-4 text-right text-gray-600">
+                  <td className="px-4 py-4 text-right text-gray-600">
                     {a.elevationGain > 0 ? '+' + Math.round(a.elevationGain) + ' m' : '—'}
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    {confirmDelete === a.id ? (
+                      <span className="flex items-center gap-1 justify-end">
+                        <button
+                          onClick={() => handleDelete(a.id)}
+                          className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        >
+                          Elimina
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(null)}
+                          className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                        >
+                          Annulla
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDelete(a.id)}
+                        className="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-base leading-none"
+                        title="Elimina"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
