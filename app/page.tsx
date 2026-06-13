@@ -14,6 +14,7 @@ import { fetchStravaActivities } from '@/lib/strava'
 import { StatCard } from '@/components/StatCard'
 import { WeeklyChart } from '@/components/WeeklyChart'
 import { GpxUpload } from '@/components/GpxUpload'
+import { HealthUpload } from '@/components/HealthUpload'
 import { formatPace, formatDistance, formatDate } from '@/lib/utils'
 
 export default function Dashboard() {
@@ -172,17 +173,25 @@ export default function Dashboard() {
             <div className="text-4xl mb-3">🏃</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Nessun allenamento</h2>
             <p className="text-gray-500 text-sm mb-4">
-              Connetti Strava o importa file GPX per iniziare
+              Importa dati da Apple Health o file GPX per iniziare
             </p>
           </div>
-          <GpxUpload onImport={setActivities} />
+          <HealthUpload onImport={setActivities} />
+          <div>
+            <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Oppure importa GPX</p>
+            <GpxUpload onImport={setActivities} />
+          </div>
         </div>
       )}
 
       {activities.length > 0 && (
-        <div>
-          <h2 className="font-semibold text-gray-800 mb-3">Importa GPX</h2>
-          <GpxUpload onImport={setActivities} />
+        <div className="space-y-4">
+          <h2 className="font-semibold text-gray-800">Importa dati</h2>
+          <HealthUpload onImport={setActivities} />
+          <div>
+            <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Oppure importa GPX</p>
+            <GpxUpload onImport={setActivities} />
+          </div>
         </div>
       )}
     </div>
