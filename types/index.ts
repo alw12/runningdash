@@ -9,6 +9,7 @@ export interface Activity {
   maxHeartRate?: number
   avgPace?: number       // seconds per km
   type: string
+  shoe?: string
 }
 
 export interface ActivityStream {
@@ -18,4 +19,11 @@ export interface ActivityStream {
   velocity?: number[]    // m/s
   altitude?: number[]
   latlng?: [number, number][]
+}
+
+export interface Shoe {
+  id: string
+  brand: string
+  model: string
+  displayName: string
 }
