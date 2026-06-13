@@ -6,6 +6,7 @@ import { getActivities, saveActivities, mergeActivities } from '@/lib/storage'
 import { StatCard } from '@/components/StatCard'
 import { WeeklyChart } from '@/components/WeeklyChart'
 import { GpxUpload } from '@/components/GpxUpload'
+import { StravaExportUpload } from '@/components/StravaExportUpload'
 import { formatPace, formatDistance, formatDate } from '@/lib/utils'
 
 export default function Dashboard() {
@@ -91,18 +92,20 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div>
-            <h2 className="font-semibold text-gray-800 mb-3">Importa altri GPX</h2>
+          <div className="space-y-3">
+            <h2 className="font-semibold text-gray-800">Importa dati</h2>
+            <StravaExportUpload onImport={handleImport} />
             <GpxUpload onImport={handleImport} />
           </div>
         </>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
             <div className="text-4xl mb-3">🏃</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Nessun allenamento</h2>
-            <p className="text-gray-500 text-sm">Importa file GPX per iniziare</p>
+            <p className="text-gray-500 text-sm">Importa dati Strava o file GPX per iniziare</p>
           </div>
+          <StravaExportUpload onImport={handleImport} />
           <GpxUpload onImport={handleImport} />
         </div>
       )}
