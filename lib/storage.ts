@@ -1,28 +1,9 @@
 'use client'
-import { Activity, ActivityStream, StravaTokens } from '@/types'
+import { Activity, ActivityStream } from '@/types'
 
 const KEYS = {
-  TOKENS: 'strava_tokens',
   ACTIVITIES: 'rd_activities',
   STREAMS: 'rd_streams_',
-}
-
-export function saveTokens(tokens: StravaTokens) {
-  localStorage.setItem(KEYS.TOKENS, JSON.stringify(tokens))
-}
-
-export function getTokens(): StravaTokens | null {
-  if (typeof window === 'undefined') return null
-  const raw = localStorage.getItem(KEYS.TOKENS)
-  return raw ? JSON.parse(raw) : null
-}
-
-export function clearTokens() {
-  localStorage.removeItem(KEYS.TOKENS)
-}
-
-export function isTokenExpired(tokens: StravaTokens): boolean {
-  return Date.now() / 1000 >= tokens.expires_at - 60
 }
 
 export function saveActivities(activities: Activity[]) {

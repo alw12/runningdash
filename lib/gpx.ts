@@ -132,7 +132,6 @@ export function parseGpxFile(xml: string, filename: string): {
     maxHeartRate: maxHR,
     avgPace,
     type: 'Run',
-    source: 'gpx',
   }
 
   const stream: ActivityStream = {

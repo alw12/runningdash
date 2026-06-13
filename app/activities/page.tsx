@@ -86,7 +86,6 @@ export default function ActivitiesPage() {
                     <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-blue-600">
                       {a.name}
                     </Link>
-                    <span className="ml-2 text-xs text-gray-400 uppercase">{a.source}</span>
                   </td>
                   <td className="px-4 py-4 text-gray-500">{formatDate(a.date)}</td>
                   <td className="px-4 py-4 text-right font-medium">{formatDistance(a.distance)}</td>

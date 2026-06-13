@@ -1,68 +1,30 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Activity, StravaTokens } from '@/types'
-import {
-  getActivities,
-  getTokens,
-  saveTokens,
-  saveActivities,
-  mergeActivities,
-  isTokenExpired,
-} from '@/lib/storage'
-import { fetchStravaActivities } from '@/lib/strava'
+import { Activity } from '@/types'
+import { getActivities, saveActivities, mergeActivities } from '@/lib/storage'
 import { StatCard } from '@/components/StatCard'
 import { WeeklyChart } from '@/components/WeeklyChart'
 import { GpxUpload } from '@/components/GpxUpload'
-import { HealthUpload } from '@/components/HealthUpload'
 import { formatPace, formatDistance, formatDate } from '@/lib/utils'
 
 export default function Dashboard() {
   const [activities, setActivities] = useState<Activity[]>([])
-  const [tokens, setTokens] = useState<StravaTokens | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setActivities(getActivities())
-    setTokens(getTokens())
   }, [])
 
-  const refreshToken = useCallback(async (tok: StravaTokens): Promise<StravaTokens> => {
-    if (!isTokenExpired(tok)) return tok
-    const res = await fetch('/api/strava', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: tok.refresh_token }),
-    })
-    if (!res.ok) throw new Error('Token scaduto, riconnetti Strava')
-    const valid: StravaTokens = await res.json()
-    saveTokens(valid)
-    setTokens(valid)
-    return valid
-  }, [])
-
-  async function syncStrava() {
-    if (!tokens) return
-    setLoading(true)
-    setError(null)
-    try {
-      const valid = await refreshToken(tokens)
-      const fetched = await fetchStravaActivities(valid.access_token)
-      const merged = mergeActivities(getActivities(), fetched)
-      saveActivities(merged)
-      setActivities(merged)
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setLoading(false)
-    }
+  function handleImport(imported: Activity[]) {
+    const merged = mergeActivities(getActivities(), imported)
+    saveActivities(merged)
+    setActivities(merged)
   }
 
   const recent = activities.slice(0, 30)
   const totalKm = recent.reduce((s, a) => s + a.distance, 0) / 1000
-  const hrActivities = recent.filter((a) => a.avgHeartRate)
   const paceActivities = recent.filter((a) => a.avgPace)
+  const hrActivities = recent.filter((a) => a.avgHeartRate)
   const avgPace = paceActivities.length
     ? paceActivities.reduce((s, a) => s + (a.avgPace ?? 0), 0) / paceActivities.length
     : 0
@@ -72,45 +34,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <div className="flex gap-3">
-          {tokens ? (
-            <button
-              onClick={syncStrava}
-              disabled={loading}
-              className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Sincronizzazione…' : '🔄 Sincronizza Strava'}
-            </button>
-          ) : (
-            <a
-              href="/api/auth/strava"
-              className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors"
-            >
-              Connetti Strava
-            </a>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-          {error}
-        </div>
-      )}
-
-      {tokens && (
-        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2 text-sm text-green-700">
-          <span>✓</span>
-          <span>
-            Connesso come{' '}
-            <strong>
-              {tokens.athlete?.firstname} {tokens.athlete?.lastname}
-            </strong>
-          </span>
-        </div>
-      )}
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
 
       {activities.length > 0 ? (
         <>
@@ -166,32 +90,20 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
+
+          <div>
+            <h2 className="font-semibold text-gray-800 mb-3">Importa altri GPX</h2>
+            <GpxUpload onImport={handleImport} />
+          </div>
         </>
       ) : (
         <div className="space-y-6">
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
             <div className="text-4xl mb-3">🏃</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">Nessun allenamento</h2>
-            <p className="text-gray-500 text-sm mb-4">
-              Importa dati da Apple Health o file GPX per iniziare
-            </p>
+            <p className="text-gray-500 text-sm">Importa file GPX per iniziare</p>
           </div>
-          <HealthUpload onImport={setActivities} />
-          <div>
-            <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Oppure importa GPX</p>
-            <GpxUpload onImport={setActivities} />
-          </div>
-        </div>
-      )}
-
-      {activities.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="font-semibold text-gray-800">Importa dati</h2>
-          <HealthUpload onImport={setActivities} />
-          <div>
-            <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">Oppure importa GPX</p>
-            <GpxUpload onImport={setActivities} />
-          </div>
+          <GpxUpload onImport={handleImport} />
         </div>
       )}
     </div>

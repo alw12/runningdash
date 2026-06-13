@@ -1,9 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Activity, ActivityStream, StravaTokens } from '@/types'
-import { getActivities, getStream, saveStream, getTokens, saveTokens, isTokenExpired } from '@/lib/storage'
-import { fetchStravaActivityStreams } from '@/lib/strava'
+import { Activity, ActivityStream } from '@/types'
+import { getActivities, getStream } from '@/lib/storage'
 import { StatCard } from '@/components/StatCard'
 import { ActivityChart } from '@/components/ActivityChart'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
@@ -16,16 +15,18 @@ interface ChartPoint {
 }
 
 function buildChartData(stream: ActivityStream): ChartPoint[] {
-  return stream.distance.map((dist, i) => {
-    const vel = stream.velocity?.[i]
-    const pace = vel && vel > 0 ? 1000 / vel : undefined
-    return {
-      dist: Math.round(dist),
-      hr: stream.heartrate?.[i],
-      pace,
-      alt: stream.altitude?.[i],
-    }
-  }).filter((_, i) => i % 5 === 0) // downsample for perf
+  return stream.distance
+    .map((dist, i) => {
+      const vel = stream.velocity?.[i]
+      const pace = vel && vel > 0 ? 1000 / vel : undefined
+      return {
+        dist: Math.round(dist),
+        hr: stream.heartrate?.[i],
+        pace,
+        alt: stream.altitude?.[i],
+      }
+    })
+    .filter((_, i) => i % 5 === 0)
 }
 
 export default function ActivityDetail() {
@@ -33,48 +34,14 @@ export default function ActivityDetail() {
   const router = useRouter()
   const [activity, setActivity] = useState<Activity | null>(null)
   const [stream, setStream] = useState<ActivityStream | null>(null)
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const all = getActivities()
     const found = all.find((a) => a.id === id)
     if (!found) { router.push('/activities'); return }
     setActivity(found)
-
-    const cached = getStream(id)
-    if (cached) {
-      setStream(cached)
-      return
-    }
-
-    if (found.source === 'strava' && found.stravaId) {
-      loadStravaStream(found.stravaId)
-    }
+    setStream(getStream(id))
   }, [id, router])
-
-  async function loadStravaStream(stravaId: number) {
-    const tokens = getTokens()
-    if (!tokens) return
-    setLoading(true)
-    try {
-      let valid: StravaTokens = tokens
-      if (isTokenExpired(tokens)) {
-        const res = await fetch('/api/strava', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken: tokens.refresh_token }),
-        })
-        if (!res.ok) return
-        valid = await res.json()
-        saveTokens(valid)
-      }
-      const s = await fetchStravaActivityStreams(valid.access_token, stravaId)
-      saveStream(id, s)
-      setStream(s)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (!activity) return null
 
@@ -117,19 +84,10 @@ export default function ActivityDetail() {
         />
       </div>
 
-      {loading && (
-        <div className="text-center text-gray-400 text-sm py-4">Caricamento dati stream…</div>
-      )}
-
-      {chartData.length > 0 && (
+      {chartData.length > 0 && (hasHR || hasPace) && (
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h2 className="font-semibold text-gray-800 mb-4">FC e Passo per distanza</h2>
-          <ActivityChart
-            data={chartData}
-            showHR={hasHR}
-            showPace={hasPace}
-            showAlt={false}
-          />
+          <ActivityChart data={chartData} showHR={hasHR} showPace={hasPace} showAlt={false} />
         </div>
       )}
 
@@ -140,9 +98,9 @@ export default function ActivityDetail() {
         </div>
       )}
 
-      {chartData.length === 0 && !loading && activity.source === 'strava' && (
+      {chartData.length === 0 && (
         <div className="bg-gray-50 rounded-2xl p-6 text-center text-gray-400 text-sm">
-          Dati stream non disponibili. Assicurati di essere connesso a Strava.
+          Nessun dato stream disponibile per questo allenamento.
         </div>
       )}
     </div>
