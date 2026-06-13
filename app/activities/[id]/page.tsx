@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Activity, ActivityStream } from '@/types'
 import { getActivities, getStream, deleteActivity } from '@/lib/storage'
 import { ActivityChart } from '@/components/ActivityChart'
+import { RouteMap } from '@/components/RouteMap'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
 
 interface ChartPoint { dist: number; hr?: number; pace?: number; alt?: number }
@@ -95,6 +96,24 @@ export default function ActivityDetail() {
           </div>
         ))}
       </div>
+
+      {/* Route map */}
+      {(stream?.latlng?.length ?? 0) > 1 && (
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-800">Percorso</h2>
+          </div>
+          <div className="p-6 flex justify-center">
+            <RouteMap
+              points={stream!.latlng!}
+              width={600}
+              height={300}
+              strokeWidth={2.5}
+              className="w-full max-w-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       {chartData.length > 0 && (hasHR || hasPace) && (
         <div className="bg-white rounded-2xl p-6 border border-gray-200">
