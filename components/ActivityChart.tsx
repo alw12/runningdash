@@ -1,13 +1,15 @@
 'use client'
 import {
-  LineChart,
+  ComposedChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceLine,
 } from 'recharts'
 import { formatPace } from '@/lib/utils'
 
@@ -18,6 +20,36 @@ interface ChartPoint {
   alt?: number
 }
 
+interface TooltipPayloadEntry {
+  name: string
+  value: number
+  color: string
+}
+
+function CustomTooltip({ active, payload, label }: {
+  active?: boolean
+  payload?: TooltipPayloadEntry[]
+  label?: number
+}) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-gray-900 text-white rounded-xl px-3 py-2.5 text-xs shadow-xl border border-gray-700">
+      <p className="text-gray-400 mb-1.5 font-medium">{((label ?? 0) / 1000).toFixed(2)} km</p>
+      {payload.map((p) => (
+        <div key={p.name} className="flex items-center gap-2 mb-0.5">
+          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
+          <span className="text-gray-300">{p.name}:</span>
+          <span className="font-bold">
+            {p.name === 'Passo' ? formatPace(p.value) + '/km'
+             : p.name === 'FC' ? Math.round(p.value) + ' bpm'
+             : Math.round(p.value) + ' m'}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 interface ActivityChartProps {
   data: ChartPoint[]
   showHR?: boolean
@@ -25,44 +57,119 @@ interface ActivityChartProps {
   showAlt?: boolean
 }
 
-function PaceTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value: number; name: string }> }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-2 text-xs shadow">
-      {payload.map((p) => (
-        <div key={p.name}>
-          <span className="font-medium">{p.name}: </span>
-          {p.name === 'Passo' ? formatPace(p.value) + '/km' : p.value}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export function ActivityChart({ data, showHR = true, showPace = true, showAlt = false }: ActivityChartProps) {
+  const avgHR = showHR && data.some(d => d.hr)
+    ? data.filter(d => d.hr).reduce((s, d) => s + (d.hr ?? 0), 0) / data.filter(d => d.hr).length
+    : null
+  const avgPace = showPace && data.some(d => d.pace)
+    ? data.filter(d => d.pace).reduce((s, d) => s + (d.pace ?? 0), 0) / data.filter(d => d.pace).length
+    : null
+
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+    <ResponsiveContainer width="100%" height={280}>
+      <ComposedChart data={data} margin={{ top: 10, right: 16, bottom: 0, left: 0 }}>
+        <defs>
+          <linearGradient id="hrGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15} />
+            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="altGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0.05} />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+
         <XAxis
           dataKey="dist"
           tickFormatter={(v) => (v / 1000).toFixed(1) + ' km'}
-          tick={{ fontSize: 11 }}
+          tick={{ fontSize: 11, fill: '#94a3b8' }}
+          axisLine={false}
+          tickLine={false}
         />
-        <YAxis yAxisId="hr" hide={!showHR} domain={['dataMin - 5', 'dataMax + 5']} tick={{ fontSize: 11 }} />
-        <YAxis yAxisId="pace" orientation="right" hide={!showPace} tickFormatter={formatPace} tick={{ fontSize: 11 }} />
-        <YAxis yAxisId="alt" hide={!showAlt} tick={{ fontSize: 11 }} />
-        <Tooltip content={<PaceTooltip />} />
-        <Legend />
+
         {showHR && (
-          <Line
+          <YAxis
+            yAxisId="hr"
+            domain={['dataMin - 10', 'dataMax + 10']}
+            tick={{ fontSize: 11, fill: '#ef4444' }}
+            axisLine={false}
+            tickLine={false}
+            width={36}
+          />
+        )}
+        {showPace && (
+          <YAxis
+            yAxisId="pace"
+            orientation="right"
+            domain={['dataMin - 30', 'dataMax + 30']}
+            tickFormatter={formatPace}
+            tick={{ fontSize: 11, fill: '#3b82f6' }}
+            axisLine={false}
+            tickLine={false}
+            width={42}
+          />
+        )}
+        {showAlt && (
+          <YAxis
+            yAxisId="alt"
+            tick={{ fontSize: 11, fill: '#22c55e' }}
+            axisLine={false}
+            tickLine={false}
+            width={36}
+          />
+        )}
+
+        <Tooltip content={<CustomTooltip />} />
+        <Legend
+          wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
+          formatter={(value) => <span style={{ color: '#64748b' }}>{value}</span>}
+        />
+
+        {showHR && avgHR && (
+          <ReferenceLine
+            yAxisId="hr"
+            y={avgHR}
+            stroke="#ef4444"
+            strokeDasharray="4 4"
+            strokeOpacity={0.5}
+          />
+        )}
+        {showPace && avgPace && (
+          <ReferenceLine
+            yAxisId="pace"
+            y={avgPace}
+            stroke="#3b82f6"
+            strokeDasharray="4 4"
+            strokeOpacity={0.5}
+          />
+        )}
+
+        {showAlt && (
+          <Area
+            yAxisId="alt"
+            type="monotone"
+            dataKey="alt"
+            name="Quota"
+            stroke="#22c55e"
+            strokeWidth={1.5}
+            fill="url(#altGrad)"
+            dot={false}
+            activeDot={{ r: 4, fill: '#22c55e' }}
+          />
+        )}
+        {showHR && (
+          <Area
             yAxisId="hr"
             type="monotone"
             dataKey="hr"
-            name="FC (bpm)"
+            name="FC"
             stroke="#ef4444"
+            strokeWidth={2}
+            fill="url(#hrGrad)"
             dot={false}
-            strokeWidth={1.5}
+            activeDot={{ r: 4, fill: '#ef4444' }}
           />
         )}
         {showPace && (
@@ -72,22 +179,12 @@ export function ActivityChart({ data, showHR = true, showPace = true, showAlt = 
             dataKey="pace"
             name="Passo"
             stroke="#3b82f6"
+            strokeWidth={2}
             dot={false}
-            strokeWidth={1.5}
+            activeDot={{ r: 4, fill: '#3b82f6' }}
           />
         )}
-        {showAlt && (
-          <Line
-            yAxisId="alt"
-            type="monotone"
-            dataKey="alt"
-            name="Quota (m)"
-            stroke="#22c55e"
-            dot={false}
-            strokeWidth={1.5}
-          />
-        )}
-      </LineChart>
+      </ComposedChart>
     </ResponsiveContainer>
   )
 }

@@ -3,19 +3,26 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Activity } from '@/types'
 import { getActivities, deleteActivities } from '@/lib/storage'
-import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
+import { formatPace, formatDistance, formatDuration, formatDate, activityLabel, isWalk } from '@/lib/utils'
 
 type SortKey = 'date' | 'distance' | 'pace' | 'hr'
 
 export default function ActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [sort, setSort] = useState<SortKey>('date')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'run' | 'walk'>('all')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirmBulk, setConfirmBulk] = useState(false)
 
   useEffect(() => { setActivities(getActivities()) }, [])
 
-  const sorted = [...activities].sort((a, b) => {
+  const visible = activities.filter(a => {
+    if (typeFilter === 'run') return !isWalk(a.avgPace)
+    if (typeFilter === 'walk') return isWalk(a.avgPace)
+    return true
+  })
+
+  const sorted = [...visible].sort((a, b) => {
     switch (sort) {
       case 'date':     return new Date(b.date).getTime() - new Date(a.date).getTime()
       case 'distance': return b.distance - a.distance
@@ -90,6 +97,16 @@ export default function ActivitiesPage() {
       </div>
 
       {/* Sort */}
+      {/* Type filter */}
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+        {([['all','Tutti'], ['run','Corse'], ['walk','Passeggiate']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => setTypeFilter(k)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === k ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+            {l}
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Ordina:</span>
         {SORTS.map((s) => (
@@ -154,9 +171,16 @@ export default function ActivitiesPage() {
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
-                      {a.name}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
+                        {a.name}
+                      </Link>
+                      {isWalk(a.avgPace) && (
+                        <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-medium">
+                          passeggiata
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-gray-500">{formatDate(a.date)}</td>
                   <td className="px-4 py-3 text-right font-semibold">{formatDistance(a.distance)}</td>
