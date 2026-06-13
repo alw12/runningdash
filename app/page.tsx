@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Activity } from '@/types'
 import { getActivities, saveActivities, mergeActivities } from '@/lib/storage'
+import { autoSeedIfEmpty } from '@/lib/seed'
 import { WeeklyChart } from '@/components/WeeklyChart'
 import { GpxUpload } from '@/components/GpxUpload'
 import { StravaExportUpload } from '@/components/StravaExportUpload'
@@ -12,7 +13,9 @@ export default function Dashboard() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [showImport, setShowImport] = useState(false)
 
-  useEffect(() => { setActivities(getActivities()) }, [])
+  useEffect(() => {
+    autoSeedIfEmpty().then(() => setActivities(getActivities()))
+  }, [])
 
   function handleImport(imported: Activity[]) {
     const merged = mergeActivities(getActivities(), imported)
