@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Activity, ActivityStream } from '@/types'
-import { getActivities, getStream, deleteActivity, saveActivities } from '@/lib/storage'
+import { getActivities, getStream, deleteActivity, saveActivities, getShoes } from '@/lib/storage'
 import { ActivityChart } from '@/components/ActivityChart'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
 import { getZoneLabel } from '@/lib/zone-utils'
@@ -40,12 +40,24 @@ export default function ActivityDetail() {
   const [activity, setActivity] = useState<Activity | null>(null)
   const [stream, setStream] = useState<ActivityStream | null>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [availableShoes, setAvailableShoes] = useState<string[]>([])
 
   useEffect(() => {
     const found = getActivities().find((a) => a.id === id)
     if (!found) { router.push('/activities'); return }
     setActivity(found)
     setStream(getStream(id))
+
+    // Build shoe list: prefer structured Shoe records, fallback to unique strings from activities
+    const structuredShoes = getShoes()
+    if (structuredShoes.length > 0) {
+      setAvailableShoes(structuredShoes.map((s) => s.displayName))
+    } else {
+      const fromActivities = Array.from(
+        new Set(getActivities().map((a) => a.shoe).filter((s): s is string => Boolean(s)))
+      )
+      setAvailableShoes(fromActivities)
+    }
   }, [id, router])
 
   function setLabel(value: string) {
@@ -55,6 +67,15 @@ export default function ActivityDetail() {
     const updated = all.map((a) => a.id === id ? { ...a, label: newLabel } : a)
     saveActivities(updated)
     setActivity((prev) => prev ? { ...prev, label: newLabel } : prev)
+  }
+
+  function setShoe(value: string | undefined) {
+    if (!activity) return
+    // Toggle: clicking the current shoe removes it
+    const newShoe = activity.shoe === value ? undefined : value
+    const all = getActivities()
+    saveActivities(all.map((a) => a.id === id ? { ...a, shoe: newShoe } : a))
+    setActivity((prev) => prev ? { ...prev, shoe: newShoe } : prev)
   }
 
   if (!activity) return null
@@ -152,6 +173,44 @@ export default function ActivityDetail() {
             )
           })}
         </div>
+      </div>
+
+      {/* Shoe selector */}
+      <div className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Scarpe</p>
+        {availableShoes.length === 0 ? (
+          <p className="text-sm text-gray-400">Nessuna scarpa registrata</p>
+        ) : availableShoes.length <= 5 ? (
+          <div className="flex flex-wrap gap-2">
+            {availableShoes.map((shoe) => {
+              const active = activity.shoe === shoe
+              return (
+                <button
+                  key={shoe}
+                  onClick={() => setShoe(shoe)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    active
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {shoe}
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <select
+            value={activity.shoe ?? ''}
+            onChange={(e) => setShoe(e.target.value || undefined)}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
+          >
+            <option value="">-- Nessuna scarpa --</option>
+            {availableShoes.map((shoe) => (
+              <option key={shoe} value={shoe}>{shoe}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Stats */}
