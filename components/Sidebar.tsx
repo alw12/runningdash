@@ -8,6 +8,7 @@ const NAV = [
   { href: '/routes', label: 'Percorsi', icon: '◎' },
   { href: '/segments', label: 'Segmenti', icon: '◇' },
   { href: '/shoes', label: 'Scarpe', icon: '◈' },
+  { href: '/calculator', label: 'Calcolatore', icon: '◆' },
 ]
 
 export function Sidebar() {

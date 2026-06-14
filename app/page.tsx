@@ -1,21 +1,34 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Activity } from '@/types'
-import { getActivities, saveActivities, mergeActivities } from '@/lib/storage'
+import { Activity, Shoe } from '@/types'
+import { getActivities, saveActivities, mergeActivities, getShoes } from '@/lib/storage'
 import { autoSeedIfEmpty } from '@/lib/seed'
-import { WeeklyChart } from '@/components/WeeklyChart'
+
+const ONBOARDED_KEY = 'rd_onboarded_v1'
+import { KmChart } from '@/components/KmChart'
 import { GpxUpload } from '@/components/GpxUpload'
 import { StravaExportUpload } from '@/components/StravaExportUpload'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
+import { LABEL_STYLES } from '@/lib/labels'
 
 export default function Dashboard() {
+  const router = useRouter()
   const [activities, setActivities] = useState<Activity[]>([])
+  const [shoes, setShoes] = useState<Shoe[]>([])
   const [showImport, setShowImport] = useState(false)
 
   useEffect(() => {
-    autoSeedIfEmpty().then(() => setActivities(getActivities()))
-  }, [])
+    if (!localStorage.getItem(ONBOARDED_KEY)) {
+      router.replace('/onboarding')
+      return
+    }
+    autoSeedIfEmpty().then(() => {
+      setActivities(getActivities())
+      setShoes(getShoes())
+    })
+  }, [router])
 
   function handleImport(imported: Activity[]) {
     const merged = mergeActivities(getActivities(), imported)
@@ -30,6 +43,24 @@ export default function Dashboard() {
   const hrActs = recent.filter((a) => a.avgHeartRate)
   const avgPace = paceActs.length ? paceActs.reduce((s, a) => s + (a.avgPace ?? 0), 0) / paceActs.length : 0
   const avgHR = hrActs.length ? hrActs.reduce((s, a) => s + (a.avgHeartRate ?? 0), 0) / hrActs.length : 0
+  // Scarpe attive: usate in almeno un'activity negli ultimi 90 giorni
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 86400000)
+  const recentActivities90 = activities.filter((a) => new Date(a.date) >= ninetyDaysAgo)
+  const activeShoeNames = new Set(recentActivities90.map((a) => a.shoe).filter((x): x is string => Boolean(x)))
+
+  const DEFAULT_MAX_KM = 800
+  const activeShoeStats = shoes
+    .filter((s) => activeShoeNames.has(s.displayName))
+    .map((s) => {
+      const totalKmShoe = activities
+        .filter((a) => a.shoe === s.displayName)
+        .reduce((sum, a) => sum + a.distance / 1000, 0)
+      const maxKm = s.maxKm ?? DEFAULT_MAX_KM
+      const wearPct = Math.min((totalKmShoe / maxKm) * 100, 100)
+      return { shoe: s, totalKm: totalKmShoe, maxKm, wearPct }
+    })
+    .sort((a, b) => b.wearPct - a.wearPct)
+
   const thisWeekKm = activities
     .filter((a) => {
       const d = new Date(a.date)
@@ -109,11 +140,65 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Weekly chart */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-200">
-        <h2 className="font-semibold text-gray-800 mb-4">Km settimanali</h2>
-        <WeeklyChart activities={activities} />
-      </div>
+      {/* Km chart */}
+      <KmChart activities={activities} />
+
+      {/* Scarpe attive */}
+      {activeShoeStats.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-gray-800">Scarpe</h2>
+            <Link href="/shoes" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+              Vedi tutte →
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {activeShoeStats.map(({ shoe, totalKm, maxKm, wearPct }) => {
+              const isWorn = wearPct > 80
+              const barColor =
+                wearPct <= 50
+                  ? 'bg-green-500'
+                  : wearPct <= 80
+                  ? 'bg-orange-400'
+                  : 'bg-red-500'
+              const remainingKm = Math.max(maxKm - totalKm, 0)
+              return (
+                <div key={shoe.id} className="flex items-center gap-3">
+                  {/* Nome scarpa */}
+                  <div className="w-36 shrink-0 flex items-center gap-1.5">
+                    {isWorn && (
+                      <span className="text-red-500 font-bold text-xs leading-none">!</span>
+                    )}
+                    <span
+                      className={`text-sm truncate ${
+                        isWorn ? 'text-red-600 font-semibold' : 'text-gray-700 font-medium'
+                      }`}
+                      title={shoe.displayName}
+                    >
+                      {shoe.displayName}
+                    </span>
+                  </div>
+                  {/* Barra usura */}
+                  <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${barColor}`}
+                      style={{ width: `${wearPct}%` }}
+                    />
+                  </div>
+                  {/* Km totali */}
+                  <span className="text-xs text-gray-500 w-16 text-right shrink-0">
+                    {Math.round(totalKm)} km
+                  </span>
+                  {/* Km rimanenti */}
+                  <span className="text-xs text-gray-400 w-20 text-right shrink-0">
+                    {Math.round(remainingKm)} km rimasti
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recent */}
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -131,7 +216,14 @@ export default function Dashboard() {
               className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
               <div className="min-w-0">
-                <p className="font-medium text-gray-900 text-sm truncate">{a.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-gray-900 text-sm truncate">{a.name}</p>
+                  {a.label && LABEL_STYLES[a.label] && (
+                    <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded-full font-medium ${LABEL_STYLES[a.label].bg} ${LABEL_STYLES[a.label].text}`}>
+                      {a.label}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-gray-400 mt-0.5">{formatDate(a.date)}{a.shoe ? ` · ${a.shoe}` : ''}</p>
               </div>
               <div className="flex gap-5 text-right shrink-0 ml-4">

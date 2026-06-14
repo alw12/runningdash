@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Activity } from '@/types'
 import { getActivities, deleteActivities } from '@/lib/storage'
-import { formatPace, formatDistance, formatDuration, formatDate, activityLabel, isWalk } from '@/lib/utils'
+import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
+import { getZoneLabel, isWalkZone } from '@/lib/zone-utils'
+import { LABEL_STYLES } from '@/lib/labels'
 
 type SortKey = 'date' | 'distance' | 'pace' | 'hr'
 
@@ -17,8 +19,8 @@ export default function ActivitiesPage() {
   useEffect(() => { setActivities(getActivities()) }, [])
 
   const visible = activities.filter(a => {
-    if (typeFilter === 'run') return !isWalk(a.avgPace)
-    if (typeFilter === 'walk') return isWalk(a.avgPace)
+    if (typeFilter === 'run') return !isWalkZone(a.avgPace)
+    if (typeFilter === 'walk') return isWalkZone(a.avgPace)
     return true
   })
 
@@ -96,7 +98,6 @@ export default function ActivitiesPage() {
         </div>
       </div>
 
-      {/* Sort */}
       {/* Type filter */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
         {([['all','Tutti'], ['run','Corse'], ['walk','Passeggiate']] as const).map(([k, l]) => (
@@ -157,49 +158,56 @@ export default function ActivitiesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {sorted.map((a) => (
-                <tr
-                  key={a.id}
-                  className={`transition-colors ${selected.has(a.id) ? 'bg-orange-50' : 'hover:bg-gray-50'}`}
-                >
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.has(a.id)}
-                      onChange={() => toggle(a.id)}
-                      className="rounded border-gray-300 accent-orange-500"
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
-                        {a.name}
-                      </Link>
-                      {isWalk(a.avgPace) && (
-                        <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-600 font-medium">
-                          passeggiata
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{formatDate(a.date)}</td>
-                  <td className="px-4 py-3 text-right font-semibold">{formatDistance(a.distance)}</td>
-                  <td className="px-4 py-3 text-right text-gray-600">{formatDuration(a.duration)}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-blue-600">
-                    {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-right text-red-500 font-semibold">
-                    {a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-500">
-                    {a.maxHeartRate ? Math.round(a.maxHeartRate) + ' bpm' : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-500">
-                    {a.elevationGain > 0 ? '+' + Math.round(a.elevationGain) : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{a.shoe ?? '—'}</td>
-                </tr>
-              ))}
+              {sorted.map((a) => {
+                const zone = getZoneLabel(a.avgPace)
+                return (
+                  <tr
+                    key={a.id}
+                    className={`transition-colors ${selected.has(a.id) ? 'bg-orange-50' : 'hover:bg-gray-50'}`}
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(a.id)}
+                        onChange={() => toggle(a.id)}
+                        className="rounded border-gray-300 accent-orange-500"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
+                          {a.name}
+                        </Link>
+                        {a.label && LABEL_STYLES[a.label] ? (
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${LABEL_STYLES[a.label].bg} ${LABEL_STYLES[a.label].text}`}>
+                            {a.label}
+                          </span>
+                        ) : (
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${zone.bg} ${zone.text}`}>
+                            {zone.label}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">{formatDate(a.date)}</td>
+                    <td className="px-4 py-3 text-right font-semibold">{formatDistance(a.distance)}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{formatDuration(a.duration)}</td>
+                    <td className="px-4 py-3 text-right font-semibold" style={{ color: zone.color }}>
+                      {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right text-red-500 font-semibold">
+                      {a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-500">
+                      {a.maxHeartRate ? Math.round(a.maxHeartRate) + ' bpm' : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-500">
+                      {a.elevationGain > 0 ? '+' + Math.round(a.elevationGain) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{a.shoe ?? '—'}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

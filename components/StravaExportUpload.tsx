@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useState } from 'react'
 import { parseStravaExportCSV, parseShoesCSV } from '@/lib/strava-export'
-import { saveActivities, getActivities, mergeActivities, saveShoes } from '@/lib/storage'
+import { saveActivities, getActivities, mergeActivities, saveShoes, getShoes, mergeShoes } from '@/lib/storage'
 import { Activity } from '@/types'
 
 interface StravaExportUploadProps {
@@ -37,9 +37,10 @@ export function StravaExportUpload({ onImport, compact }: StravaExportUploadProp
   async function handleShoes(file: File | null) {
     if (!file) return
     const text = await file.text()
-    const shoes = parseShoesCSV(text)
-    saveShoes(shoes)
-    setStatus((s) => ({ count: s?.count ?? 0, shoes: shoes.length }))
+    const incoming = parseShoesCSV(text)
+    const merged = mergeShoes(getShoes(), incoming)
+    saveShoes(merged)
+    setStatus((s) => ({ count: s?.count ?? 0, shoes: incoming.length }))
   }
 
   if (compact) {

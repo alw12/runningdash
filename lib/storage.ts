@@ -8,6 +8,7 @@ const KEYS = {
 }
 
 export function saveActivities(activities: Activity[]) {
+  if (typeof window === 'undefined') return
   localStorage.setItem(KEYS.ACTIVITIES, JSON.stringify(activities))
 }
 
@@ -18,17 +19,20 @@ export function getActivities(): Activity[] {
 }
 
 export function deleteActivity(id: string) {
+  if (typeof window === 'undefined') return
   saveActivities(getActivities().filter((a) => a.id !== id))
   localStorage.removeItem(KEYS.STREAMS + id)
 }
 
 export function deleteActivities(ids: string[]) {
+  if (typeof window === 'undefined') return
   const set = new Set(ids)
   saveActivities(getActivities().filter((a) => !set.has(a.id)))
   ids.forEach((id) => localStorage.removeItem(KEYS.STREAMS + id))
 }
 
 export function saveStream(activityId: string, stream: ActivityStream) {
+  if (typeof window === 'undefined') return
   localStorage.setItem(KEYS.STREAMS + activityId, JSON.stringify(stream))
 }
 
@@ -39,6 +43,7 @@ export function getStream(activityId: string): ActivityStream | null {
 }
 
 export function saveShoes(shoes: Shoe[]) {
+  if (typeof window === 'undefined') return
   localStorage.setItem(KEYS.SHOES, JSON.stringify(shoes))
 }
 
@@ -46,6 +51,12 @@ export function getShoes(): Shoe[] {
   if (typeof window === 'undefined') return []
   const raw = localStorage.getItem(KEYS.SHOES)
   return raw ? JSON.parse(raw) : []
+}
+
+export function mergeShoes(existing: Shoe[], incoming: Shoe[]): Shoe[] {
+  const map = new Map(existing.map((s) => [s.displayName, s]))
+  incoming.forEach((s) => { if (!map.has(s.displayName)) map.set(s.displayName, s) })
+  return Array.from(map.values())
 }
 
 export function mergeActivities(existing: Activity[], incoming: Activity[]): Activity[] {

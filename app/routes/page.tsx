@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { Activity, ActivityStream } from '@/types'
 import { getActivities, getStream } from '@/lib/storage'
 import { RouteMap } from '@/components/RouteMap'
-import { formatDistance, formatDate, formatPace, activityLabel, isWalk } from '@/lib/utils'
+import { formatDistance, formatDate, formatPace } from '@/lib/utils'
+import { getZoneLabel, isWalkZone } from '@/lib/zone-utils'
 
 interface RouteEntry {
   activity: Activity
@@ -26,16 +27,16 @@ export default function RoutesPage() {
 
   const filtered = withGps
     .filter((r) => {
-      if (filter === 'run') return !isWalk(r.activity.avgPace)
-      if (filter === 'walk') return isWalk(r.activity.avgPace)
+      if (filter === 'run') return !isWalkZone(r.activity.avgPace)
+      if (filter === 'walk') return isWalkZone(r.activity.avgPace)
       return true
     })
     .filter((r) => !search || r.activity.name.toLowerCase().includes(search.toLowerCase()))
 
   const FILTERS: { key: typeof filter; label: string }[] = [
     { key: 'all', label: `Tutti (${withGps.length})` },
-    { key: 'run', label: `Corse (${withGps.filter(r => !isWalk(r.activity.avgPace)).length})` },
-    { key: 'walk', label: `Passeggiate (${withGps.filter(r => isWalk(r.activity.avgPace)).length})` },
+    { key: 'run', label: `Corse (${withGps.filter(r => !isWalkZone(r.activity.avgPace)).length})` },
+    { key: 'walk', label: `Passeggiate (${withGps.filter(r => isWalkZone(r.activity.avgPace)).length})` },
   ]
 
   return (
@@ -82,49 +83,48 @@ export default function RoutesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map(({ activity: a, stream }) => (
-            <Link
-              key={a.id}
-              href={`/activities/${a.id}`}
-              className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-orange-300 hover:shadow-md transition-all group"
-            >
-              <div className="bg-gray-50 p-3">
-                <RouteMap
-                  points={stream?.latlng ?? []}
-                  width={320}
-                  height={150}
-                  strokeColor={isWalk(a.avgPace) ? '#8b5cf6' : '#f97316'}
-                  className="w-full"
-                />
-              </div>
-              <div className="px-4 py-3">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-gray-900 text-sm group-hover:text-orange-500 transition-colors leading-tight">
-                    {a.name}
-                  </p>
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 ${
-                    isWalk(a.avgPace)
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'bg-orange-100 text-orange-700'
-                  }`}>
-                    {activityLabel(a.avgPace)}
-                  </span>
+          {filtered.map(({ activity: a, stream }) => {
+            const zone = getZoneLabel(a.avgPace)
+            return (
+              <Link
+                key={a.id}
+                href={`/activities/${a.id}`}
+                className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-orange-300 hover:shadow-md transition-all group"
+              >
+                <div className="bg-gray-50 p-3">
+                  <RouteMap
+                    points={stream?.latlng ?? []}
+                    width={320}
+                    height={150}
+                    strokeColor={zone.color}
+                    className="w-full"
+                  />
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">{formatDate(a.date)}</p>
-                <div className="flex gap-3 mt-2 text-xs">
-                  <span className="font-bold text-gray-800">{formatDistance(a.distance)}</span>
-                  {a.avgPace && (
-                    <span className={`font-semibold ${isWalk(a.avgPace) ? 'text-purple-600' : 'text-blue-600'}`}>
-                      {formatPace(a.avgPace)}/km
+                <div className="px-4 py-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-gray-900 text-sm group-hover:text-orange-500 transition-colors leading-tight">
+                      {a.name}
+                    </p>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 ${zone.bg} ${zone.text}`}>
+                      {zone.label}
                     </span>
-                  )}
-                  {a.avgHeartRate && (
-                    <span className="text-red-500">{Math.round(a.avgHeartRate)} bpm</span>
-                  )}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-0.5">{formatDate(a.date)}</p>
+                  <div className="flex gap-3 mt-2 text-xs">
+                    <span className="font-bold text-gray-800">{formatDistance(a.distance)}</span>
+                    {a.avgPace && (
+                      <span className="font-semibold" style={{ color: zone.color }}>
+                        {formatPace(a.avgPace)}/km
+                      </span>
+                    )}
+                    {a.avgHeartRate && (
+                      <span className="text-red-500">{Math.round(a.avgHeartRate)} bpm</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       )}
 
@@ -134,23 +134,24 @@ export default function RoutesPage() {
             Senza GPS ({withoutGps.length})
           </summary>
           <div className="border-t border-gray-200 divide-y divide-gray-100">
-            {withoutGps.map(({ activity: a }) => (
-              <Link
-                key={a.id}
-                href={`/activities/${a.id}`}
-                className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 transition-colors"
-              >
-                <div>
-                  <span className="text-sm text-gray-700 font-medium">{a.name}</span>
-                  <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                    isWalk(a.avgPace) ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'
-                  }`}>
-                    {activityLabel(a.avgPace)}
-                  </span>
-                </div>
-                <span className="text-xs text-gray-400">{formatDate(a.date)} · {formatDistance(a.distance)}</span>
-              </Link>
-            ))}
+            {withoutGps.map(({ activity: a }) => {
+              const zone = getZoneLabel(a.avgPace)
+              return (
+                <Link
+                  key={a.id}
+                  href={`/activities/${a.id}`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 transition-colors"
+                >
+                  <div>
+                    <span className="text-sm text-gray-700 font-medium">{a.name}</span>
+                    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${zone.bg} ${zone.text}`}>
+                      {zone.label}
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-400">{formatDate(a.date)} · {formatDistance(a.distance)}</span>
+                </Link>
+              )
+            })}
           </div>
         </details>
       )}

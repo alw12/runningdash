@@ -10,6 +10,7 @@ export interface Activity {
   avgPace?: number       // seconds per km
   type: string
   shoe?: string
+  label?: string
 }
 
 export interface ActivityStream {
@@ -26,4 +27,5 @@ export interface Shoe {
   brand: string
   model: string
   displayName: string
+  maxKm?: number
 }

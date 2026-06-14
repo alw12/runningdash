@@ -3,13 +3,22 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { Activity, ActivityStream } from '@/types'
-import { getActivities, getStream, deleteActivity } from '@/lib/storage'
+import { getActivities, getStream, deleteActivity, saveActivities } from '@/lib/storage'
 import { ActivityChart } from '@/components/ActivityChart'
-import { formatPace, formatDistance, formatDuration, formatDate, activityLabel, isWalk } from '@/lib/utils'
+import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
+import { getZoneLabel } from '@/lib/zone-utils'
 
 const LeafletMap = dynamic(() => import('@/components/LeafletMap').then(m => m.LeafletMap), { ssr: false })
 
 interface ChartPoint { dist: number; hr?: number; pace?: number; alt?: number }
+
+const LABELS: { value: string; color: string; bg: string; text: string }[] = [
+  { value: 'Gara',       color: '#ef4444', bg: 'bg-red-100',    text: 'text-red-600' },
+  { value: 'Fondo lento', color: '#22c55e', bg: 'bg-green-100',  text: 'text-green-700' },
+  { value: 'Interval',   color: '#a855f7', bg: 'bg-purple-100', text: 'text-purple-700' },
+  { value: 'Recupero',   color: '#6b7280', bg: 'bg-gray-100',   text: 'text-gray-600' },
+  { value: 'Long run',   color: '#f97316', bg: 'bg-orange-100', text: 'text-orange-600' },
+]
 
 function buildChartData(stream: ActivityStream): ChartPoint[] {
   return stream.distance
@@ -39,6 +48,15 @@ export default function ActivityDetail() {
     setStream(getStream(id))
   }, [id, router])
 
+  function setLabel(value: string) {
+    if (!activity) return
+    const newLabel = activity.label === value ? undefined : value
+    const all = getActivities()
+    const updated = all.map((a) => a.id === id ? { ...a, label: newLabel } : a)
+    saveActivities(updated)
+    setActivity((prev) => prev ? { ...prev, label: newLabel } : prev)
+  }
+
   if (!activity) return null
 
   const chartData = stream ? buildChartData(stream) : []
@@ -46,12 +64,12 @@ export default function ActivityDetail() {
   const hasPace = chartData.some((p) => p.pace !== undefined)
   const hasAlt = chartData.some((p) => p.alt !== undefined)
   const hasGps = (stream?.latlng?.length ?? 0) > 1
-  const walk = isWalk(activity.avgPace)
+  const zone = getZoneLabel(activity.avgPace)
 
   const stats = [
     { label: 'Distanza', value: formatDistance(activity.distance), color: 'text-gray-900' },
     { label: 'Durata', value: formatDuration(activity.duration), color: 'text-gray-900' },
-    { label: 'Passo medio', value: activity.avgPace ? formatPace(activity.avgPace) + '/km' : '—', color: walk ? 'text-purple-600' : 'text-blue-600' },
+    { label: 'Passo medio', value: activity.avgPace ? formatPace(activity.avgPace) + '/km' : '—', color: zone.text },
     { label: 'FC media', value: activity.avgHeartRate ? Math.round(activity.avgHeartRate) + ' bpm' : '—', color: 'text-red-500' },
     { label: 'FC max', value: activity.maxHeartRate ? Math.round(activity.maxHeartRate) + ' bpm' : '—', color: 'text-red-400' },
     { label: 'Dislivello', value: activity.elevationGain > 0 ? '+' + Math.round(activity.elevationGain) + ' m' : '—', color: 'text-green-600' },
@@ -71,13 +89,22 @@ export default function ActivityDetail() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h1 className="text-2xl font-bold text-gray-900">{activity.name}</h1>
-            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-              walk ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-            }`}>
-              {activityLabel(activity.avgPace)}
-            </span>
+            {activity.label ? (
+              (() => {
+                const ldef = LABELS.find((l) => l.value === activity.label)
+                return ldef ? (
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${ldef.bg} ${ldef.text}`}>
+                    {ldef.value}
+                  </span>
+                ) : null
+              })()
+            ) : (
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${zone.bg} ${zone.text}`}>
+                {zone.label}
+              </span>
+            )}
           </div>
           <p className="text-gray-400 text-sm">
             {formatDate(activity.date)}{activity.shoe ? ` · ${activity.shoe}` : ''}
@@ -101,6 +128,29 @@ export default function ActivityDetail() {
               Elimina
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Label selector */}
+      <div className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
+        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Etichetta</p>
+        <div className="flex flex-wrap gap-2">
+          {LABELS.map((l) => {
+            const active = activity.label === l.value
+            return (
+              <button
+                key={l.value}
+                onClick={() => setLabel(l.value)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                  active
+                    ? `${l.bg} ${l.text} border-transparent shadow-sm`
+                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700'
+                }`}
+              >
+                {l.value}
+              </button>
+            )
+          })}
         </div>
       </div>
 
