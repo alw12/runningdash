@@ -282,43 +282,28 @@ export default function Dashboard() {
                 const barBg =
                   wearPct > 80 ? '#dc3545' : wearPct > 60 ? '#ffc107' : '#198754'
                 return (
-                  <div key={shoe.id} className="d-flex align-items-center gap-3">
-                    {/* Nome scarpa */}
-                    <div className="d-flex align-items-center gap-1" style={{ width: '9rem', flexShrink: 0 }}>
-                      {isWorn && (
-                        <span className="text-danger fw-bold" style={{ fontSize: '0.75rem', lineHeight: 1 }}>!</span>
-                      )}
+                  <div key={shoe.id}>
+                    <div className="d-flex align-items-center justify-content-between mb-1">
                       <span
                         className={`small text-truncate ${isWorn ? 'text-danger fw-semibold' : 'fw-medium'}`}
                         title={[shoe.brand, shoe.model, shoe.displayName].filter(Boolean).join(' ')}
                       >
-                        {shoe.displayName}
+                        {isWorn && <span className="me-1">!</span>}{shoe.displayName}
+                      </span>
+                      <span className="text-muted ms-2 text-nowrap" style={{ fontSize: '0.72rem', flexShrink: 0 }}>
+                        {Math.round(totalKmShoe)} km · {Math.round(remainingKm)} rimasti
                       </span>
                     </div>
-
-                    {/* Barra usura Bootstrap */}
-                    <div className="flex-grow-1">
-                      <div className="progress" style={{ height: '10px' }}>
-                        <div
-                          className="progress-bar"
-                          role="progressbar"
-                          style={{ width: `${wearPct}%`, background: barBg }}
-                          aria-valuenow={wearPct}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                        />
-                      </div>
+                    <div className="progress" style={{ height: '8px' }}>
+                      <div
+                        className="progress-bar"
+                        role="progressbar"
+                        style={{ width: `${wearPct}%`, background: barBg }}
+                        aria-valuenow={wearPct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      />
                     </div>
-
-                    {/* Km totali */}
-                    <span className="text-muted text-end" style={{ fontSize: '0.75rem', width: '4rem', flexShrink: 0 }}>
-                      {Math.round(totalKmShoe)} km
-                    </span>
-
-                    {/* Km rimanenti */}
-                    <span className="text-muted text-end" style={{ fontSize: '0.75rem', width: '5rem', flexShrink: 0 }}>
-                      {Math.round(remainingKm)} km rimasti
-                    </span>
                   </div>
                 )
               })}
@@ -374,7 +359,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Metriche */}
-                <div className="d-flex gap-4 text-end flex-shrink-0">
+                <div className="d-flex gap-3 text-end flex-shrink-0">
                   <div>
                     <p className="small fw-semibold mb-0">{formatDistance(a.distance)}</p>
                     <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>dist</p>
@@ -383,11 +368,11 @@ export default function Dashboard() {
                     <p className="small fw-semibold mb-0 text-brand">{a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}</p>
                     <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>passo</p>
                   </div>
-                  <div>
+                  <div className="d-none d-sm-block">
                     <p className="small fw-semibold mb-0 text-danger">{a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}</p>
                     <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>FC</p>
                   </div>
-                  <div>
+                  <div className="d-none d-sm-block">
                     <p className="small fw-semibold mb-0 text-secondary">{formatDuration(a.duration)}</p>
                     <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>durata</p>
                   </div>
