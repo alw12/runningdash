@@ -6,12 +6,21 @@ import { Activity, Shoe } from '@/types'
 import { getActivities, saveActivities, mergeActivities, getShoes } from '@/lib/storage'
 import { autoSeedIfEmpty } from '@/lib/seed'
 
-const ONBOARDED_KEY = 'rd_onboarded_v1'
 import { KmChart } from '@/components/KmChart'
 import { GpxUpload } from '@/components/GpxUpload'
 import { StravaExportUpload } from '@/components/StravaExportUpload'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
-import { LABEL_STYLES } from '@/lib/labels'
+
+const ONBOARDED_KEY = 'rd_onboarded_v1'
+
+// Hex colors for activity labels — avoids Tailwind classes that don't exist in Bootstrap
+const LABEL_COLORS: Record<string, string> = {
+  'Gara':        '#ef4444',
+  'Fondo lento': '#22c55e',
+  'Interval':    '#a855f7',
+  'Recupero':    '#6b7280',
+  'Long run':    '#f97316',
+}
 
 function getGreeting(): string {
   const h = new Date().getHours()
@@ -22,30 +31,30 @@ function getGreeting(): string {
 
 function ActivityTypeIcon({ type }: { type: string }) {
   const isWalkOrHike = /walk|hike/i.test(type)
-  return <span className="text-2xl leading-none">{isWalkOrHike ? '🚶' : '🏃'}</span>
+  return <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>{isWalkOrHike ? '🚶' : '🏃'}</span>
 }
 
 function TrendArrow({ thisWeek, lastWeek }: { thisWeek: number; lastWeek: number }) {
   const diff = thisWeek - lastWeek
   if (Math.abs(diff) < 0.05) {
     return (
-      <span className="flex items-center gap-1 text-xs text-gray-400 mt-1">
-        <span className="text-base leading-none">→</span>
+      <span className="d-flex align-items-center gap-1 text-muted mt-1" style={{ fontSize: '0.75rem' }}>
+        <span>→</span>
         <span>invariato vs sett. prec.</span>
       </span>
     )
   }
   if (diff > 0) {
     return (
-      <span className="flex items-center gap-1 text-xs text-green-600 mt-1">
-        <span className="text-base leading-none">↑</span>
+      <span className="d-flex align-items-center gap-1 text-success mt-1" style={{ fontSize: '0.75rem' }}>
+        <span>↑</span>
         <span>+{diff.toFixed(1)} km vs sett. prec.</span>
       </span>
     )
   }
   return (
-    <span className="flex items-center gap-1 text-xs text-red-500 mt-1">
-      <span className="text-base leading-none">↓</span>
+    <span className="d-flex align-items-center gap-1 text-danger mt-1" style={{ fontSize: '0.75rem' }}>
+      <span>↓</span>
       <span>{diff.toFixed(1)} km vs sett. prec.</span>
     </span>
   )
@@ -138,26 +147,33 @@ export default function Dashboard() {
 
   if (activities.length === 0) {
     return (
-      <div className="space-y-6">
+      <div>
         {greeting && (
-          <p className="text-sm font-medium text-gray-500">{greeting}</p>
+          <p className="text-muted fw-medium small mb-3">{greeting}</p>
         )}
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Importa i tuoi dati per iniziare</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-            <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <span className="text-orange-500">🟠</span> Strava Export
-            </h2>
-            <StravaExportUpload onImport={handleImport} />
+        <h1 className="h4 fw-bold mb-1">Dashboard</h1>
+        <p className="text-muted small mb-4">Importa i tuoi dati per iniziare</p>
+
+        <div className="row g-3">
+          <div className="col-md-6">
+            <div className="card border bg-light h-100">
+              <div className="card-body">
+                <h2 className="h6 fw-semibold mb-3">
+                  <span className="text-brand">🟠</span> Strava Export
+                </h2>
+                <StravaExportUpload onImport={handleImport} />
+              </div>
+            </div>
           </div>
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-            <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <span>📂</span> File GPX
-            </h2>
-            <GpxUpload onImport={handleImport} />
+          <div className="col-md-6">
+            <div className="card border bg-light h-100">
+              <div className="card-body">
+                <h2 className="h6 fw-semibold mb-3">
+                  <span>📂</span> File GPX
+                </h2>
+                <GpxUpload onImport={handleImport} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -165,174 +181,216 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           {greeting && (
-            <p className="text-sm font-medium text-gray-500 mb-0.5">{greeting}</p>
+            <p className="text-muted fw-medium small mb-0">{greeting}</p>
           )}
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{activities.length} allenamenti totali</p>
+          <h1 className="h4 fw-bold mb-0">Dashboard</h1>
+          <p className="text-muted small mb-0">{activities.length} allenamenti totali</p>
         </div>
         <button
           onClick={() => setShowImport(!showImport)}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="btn btn-brand btn-sm d-flex align-items-center gap-2"
         >
           + Importa
         </button>
       </div>
 
+      {/* Pannello importazione */}
       {showImport && (
-        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 grid md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-slate-900 mb-3">🟠 Strava Export</p>
-            <StravaExportUpload onImport={handleImport} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-900 mb-3">📂 File GPX</p>
-            <GpxUpload onImport={handleImport} />
+        <div className="card border bg-light mb-4">
+          <div className="card-body">
+            <div className="row g-3">
+              <div className="col-md-6">
+                <p className="small fw-semibold mb-2">🟠 Strava Export</p>
+                <StravaExportUpload onImport={handleImport} />
+              </div>
+              <div className="col-md-6">
+                <p className="small fw-semibold mb-2">📂 File GPX</p>
+                <GpxUpload onImport={handleImport} />
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Stat cards */}
+      <div className="row g-3 mb-4">
         {/* Questa settimana — con trend */}
-        <div className="rounded-2xl p-5 border bg-orange-50 border-orange-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Questa settimana</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{thisWeekKm.toFixed(1)} km</p>
-          <TrendArrow thisWeek={thisWeekKm} lastWeek={lastWeekKm} />
+        <div className="col-6 col-md-3">
+          <div className="card h-100 border-0" style={{ background: '#fff7ed', borderColor: '#fed7aa' }}>
+            <div className="card-body">
+              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Questa settimana</p>
+              <p className="fs-5 fw-bold mb-0">{thisWeekKm.toFixed(1)} km</p>
+              <TrendArrow thisWeek={thisWeekKm} lastWeek={lastWeekKm} />
+            </div>
+          </div>
         </div>
 
-        <div className="rounded-2xl p-5 border bg-orange-50 border-orange-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Km totali</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{totalKm.toFixed(0)} km</p>
-          <p className="text-xs text-gray-400 mt-1">{recent.length} corse</p>
+        <div className="col-6 col-md-3">
+          <div className="card h-100 border-0" style={{ background: '#fff7ed', borderColor: '#fed7aa' }}>
+            <div className="card-body">
+              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Km totali</p>
+              <p className="fs-5 fw-bold mb-0">{totalKm.toFixed(0)} km</p>
+              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>{recent.length} corse</p>
+            </div>
+          </div>
         </div>
 
-        <div className="rounded-2xl p-5 border bg-green-50 border-green-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Passo medio</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{avgPace > 0 ? formatPace(avgPace) + '/km' : '—'}</p>
-          <p className="text-xs text-gray-400 mt-1">ultime 30 corse</p>
+        <div className="col-6 col-md-3">
+          <div className="card h-100 border-0" style={{ background: '#f0fdf4', borderColor: '#bbf7d0' }}>
+            <div className="card-body">
+              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Passo medio</p>
+              <p className="fs-5 fw-bold mb-0">{avgPace > 0 ? formatPace(avgPace) + '/km' : '—'}</p>
+              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>ultime 30 corse</p>
+            </div>
+          </div>
         </div>
 
-        <div className="rounded-2xl p-5 border bg-red-50 border-red-100">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">FC media</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1">{avgHR > 0 ? Math.round(avgHR) + ' bpm' : '—'}</p>
-          <p className="text-xs text-gray-400 mt-1">ultime 30 corse</p>
+        <div className="col-6 col-md-3">
+          <div className="card h-100 border-0" style={{ background: '#fff1f2', borderColor: '#fecdd3' }}>
+            <div className="card-body">
+              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>FC media</p>
+              <p className="fs-5 fw-bold mb-0">{avgHR > 0 ? Math.round(avgHR) + ' bpm' : '—'}</p>
+              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>ultime 30 corse</p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Km chart */}
-      <KmChart activities={activities} />
-
-      {/* Scarpe attive */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-slate-900">Scarpe</h2>
+      <div className="card border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <KmChart activities={activities} />
         </div>
-        {activeShoeStats.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-4">Importa dati Strava per vedere le scarpe</p>
-        ) : (
-          <div className="space-y-3">
-            {activeShoeStats.map(({ shoe, totalKm, maxKm, wearPct }) => {
-              const isWorn = wearPct > 80
-              const barColor =
-                wearPct <= 50
-                  ? 'bg-green-500'
-                  : wearPct <= 80
-                  ? 'bg-orange-400'
-                  : 'bg-red-500'
-              const remainingKm = Math.max(maxKm - totalKm, 0)
-              return (
-                <div key={shoe.id} className="flex items-center gap-3">
-                  {/* Nome scarpa */}
-                  <div className="w-36 shrink-0 flex items-center gap-1.5">
-                    {isWorn && (
-                      <span className="text-red-500 font-bold text-xs leading-none">!</span>
-                    )}
-                    <span
-                      className={`text-sm truncate ${
-                        isWorn ? 'text-red-600 font-semibold' : 'text-gray-700 font-medium'
-                      }`}
-                      title={[shoe.brand, shoe.model, shoe.displayName].filter(Boolean).join(' ')}
-                    >
-                      {shoe.displayName}
-                    </span>
-                  </div>
-                  {/* Barra usura */}
-                  <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${barColor}`}
-                      style={{ width: `${wearPct}%` }}
-                    />
-                  </div>
-                  {/* Km totali */}
-                  <span className="text-xs text-gray-500 w-16 text-right shrink-0">
-                    {Math.round(totalKm)} km
-                  </span>
-                  {/* Km rimanenti */}
-                  <span className="text-xs text-gray-400 w-20 text-right shrink-0">
-                    {Math.round(remainingKm)} km rimasti
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        )}
       </div>
 
-      {/* Recent activities — cards spaziose */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="font-semibold text-slate-900">Recenti</h2>
-          <Link href="/activities" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+      {/* Scarpe attive */}
+      <div className="card border-0 shadow-sm mb-4">
+        <div className="card-body">
+          <h2 className="h6 fw-semibold mb-3">Scarpe</h2>
+          {activeShoeStats.length === 0 ? (
+            <p className="text-muted small text-center py-3 mb-0">Importa dati Strava per vedere le scarpe</p>
+          ) : (
+            <div className="d-flex flex-column gap-3">
+              {activeShoeStats.map(({ shoe, totalKm: totalKmShoe, maxKm, wearPct }) => {
+                const isWorn = wearPct > 80
+                const remainingKm = Math.max(maxKm - totalKmShoe, 0)
+                const barBg =
+                  wearPct > 80 ? '#dc3545' : wearPct > 60 ? '#ffc107' : '#198754'
+                return (
+                  <div key={shoe.id} className="d-flex align-items-center gap-3">
+                    {/* Nome scarpa */}
+                    <div className="d-flex align-items-center gap-1" style={{ width: '9rem', flexShrink: 0 }}>
+                      {isWorn && (
+                        <span className="text-danger fw-bold" style={{ fontSize: '0.75rem', lineHeight: 1 }}>!</span>
+                      )}
+                      <span
+                        className={`small text-truncate ${isWorn ? 'text-danger fw-semibold' : 'fw-medium'}`}
+                        title={[shoe.brand, shoe.model, shoe.displayName].filter(Boolean).join(' ')}
+                      >
+                        {shoe.displayName}
+                      </span>
+                    </div>
+
+                    {/* Barra usura Bootstrap */}
+                    <div className="flex-grow-1">
+                      <div className="progress" style={{ height: '10px' }}>
+                        <div
+                          className="progress-bar"
+                          role="progressbar"
+                          style={{ width: `${wearPct}%`, background: barBg }}
+                          aria-valuenow={wearPct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Km totali */}
+                    <span className="text-muted text-end" style={{ fontSize: '0.75rem', width: '4rem', flexShrink: 0 }}>
+                      {Math.round(totalKmShoe)} km
+                    </span>
+
+                    {/* Km rimanenti */}
+                    <span className="text-muted text-end" style={{ fontSize: '0.75rem', width: '5rem', flexShrink: 0 }}>
+                      {Math.round(remainingKm)} km rimasti
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recent activities */}
+      <div className="card border-0 shadow-sm">
+        <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+          <h2 className="h6 fw-semibold mb-0">Recenti</h2>
+          <Link href="/activities" className="small text-brand fw-medium text-decoration-none">
             Tutti →
           </Link>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="list-group list-group-flush">
           {activities.slice(0, 6).map((a) => (
             <Link
               key={a.id}
               href={`/activities/${a.id}`}
-              className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+              className="list-group-item list-group-item-action px-4 py-3"
             >
-              {/* Icona tipo attività */}
-              <div className="shrink-0 w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
-                <ActivityTypeIcon type={a.type} />
-              </div>
+              <div className="d-flex align-items-center gap-3">
+                {/* Icona tipo attività */}
+                <div
+                  className="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0"
+                  style={{ width: '2.5rem', height: '2.5rem', background: '#fff7ed' }}
+                >
+                  <ActivityTypeIcon type={a.type} />
+                </div>
 
-              {/* Info principale */}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-slate-900 text-sm truncate">{a.name}</p>
-                  {a.label && LABEL_STYLES[a.label] && (
-                    <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded-full font-medium ${LABEL_STYLES[a.label].bg} ${LABEL_STYLES[a.label].text}`}>
-                      {a.label}
-                    </span>
-                  )}
+                {/* Info principale */}
+                <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                  <div className="d-flex align-items-center gap-2">
+                    <p className="fw-semibold small mb-0 text-truncate">{a.name}</p>
+                    {a.label && LABEL_COLORS[a.label] && (
+                      <span
+                        className="badge-label flex-shrink-0"
+                        style={{
+                          backgroundColor: LABEL_COLORS[a.label] + '22',
+                          color: LABEL_COLORS[a.label],
+                          border: `1px solid ${LABEL_COLORS[a.label]}44`,
+                        }}
+                      >
+                        {a.label}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
+                    {formatDate(a.date)}{a.shoe ? ` · ${a.shoe}` : ''}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5">{formatDate(a.date)}{a.shoe ? ` · ${a.shoe}` : ''}</p>
-              </div>
 
-              {/* Metriche */}
-              <div className="flex gap-5 text-right shrink-0">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{formatDistance(a.distance)}</p>
-                  <p className="text-xs text-gray-500">dist</p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-orange-500">{a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}</p>
-                  <p className="text-xs text-gray-500">passo</p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-red-500">{a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}</p>
-                  <p className="text-xs text-gray-500">FC</p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-600">{formatDuration(a.duration)}</p>
-                  <p className="text-xs text-gray-500">durata</p>
+                {/* Metriche */}
+                <div className="d-flex gap-4 text-end flex-shrink-0">
+                  <div>
+                    <p className="small fw-semibold mb-0">{formatDistance(a.distance)}</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>dist</p>
+                  </div>
+                  <div>
+                    <p className="small fw-semibold mb-0 text-brand">{a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>passo</p>
+                  </div>
+                  <div>
+                    <p className="small fw-semibold mb-0 text-danger">{a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>FC</p>
+                  </div>
+                  <div>
+                    <p className="small fw-semibold mb-0 text-secondary">{formatDuration(a.duration)}</p>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>durata</p>
+                  </div>
                 </div>
               </div>
             </Link>

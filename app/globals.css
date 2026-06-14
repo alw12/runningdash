@@ -1,6 +1,27 @@
-@import "tailwindcss";
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
-body {
-  color: #111827;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+:root {
+  --bs-orange: #f97316;
+  --brand: #f97316;
+  --brand-dark: #ea580c;
 }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.btn-brand { background: var(--brand); color: #fff; border: none; }
+.btn-brand:hover { background: var(--brand-dark); color: #fff; }
+.text-brand { color: var(--brand) !important; }
+.bg-brand { background: var(--brand) !important; }
+.border-brand { border-color: var(--brand) !important; }
+.badge-label { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; }
+.progress-bar-brand { background: var(--brand); }
+/* Sidebar desktop */
+.sidebar { width: 220px; min-height: 100vh; background: #111827; flex-shrink: 0; }
+.sidebar .nav-link { color: #9ca3af; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; font-weight: 500; }
+.sidebar .nav-link:hover { color: #fff; background: #1f2937; }
+.sidebar .nav-link.active { background: var(--brand); color: #fff; }
+/* Mobile top bar */
+.mobile-topbar { background: #111827; }
+/* Offcanvas mobile nav */
+.offcanvas-nav { width: 240px !important; background: #111827; }
+.offcanvas-nav .nav-link { color: #9ca3af; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; font-weight: 500; }
+.offcanvas-nav .nav-link:hover { color: #fff; background: #1f2937; }
+.offcanvas-nav .nav-link.active { background: var(--brand); color: #fff; }

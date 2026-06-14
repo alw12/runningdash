@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { Activity, ActivityStream } from '@/types'
 import { getActivities, getStream, deleteActivity, saveActivities, getShoes } from '@/lib/storage'
@@ -12,12 +13,12 @@ const LeafletMap = dynamic(() => import('@/components/LeafletMap').then(m => m.L
 
 interface ChartPoint { dist: number; hr?: number; pace?: number; alt?: number }
 
-const LABELS: { value: string; color: string; bg: string; text: string }[] = [
-  { value: 'Gara',       color: '#ef4444', bg: 'bg-red-100',    text: 'text-red-600' },
-  { value: 'Fondo lento', color: '#22c55e', bg: 'bg-green-100',  text: 'text-green-700' },
-  { value: 'Interval',   color: '#a855f7', bg: 'bg-purple-100', text: 'text-purple-700' },
-  { value: 'Recupero',   color: '#6b7280', bg: 'bg-gray-100',   text: 'text-gray-600' },
-  { value: 'Long run',   color: '#f97316', bg: 'bg-orange-100', text: 'text-orange-600' },
+const LABELS: { value: string; color: string }[] = [
+  { value: 'Gara',        color: '#ef4444' },
+  { value: 'Fondo lento', color: '#22c55e' },
+  { value: 'Interval',    color: '#a855f7' },
+  { value: 'Recupero',    color: '#6b7280' },
+  { value: 'Long run',    color: '#f97316' },
 ]
 
 function buildChartData(stream: ActivityStream): ChartPoint[] {
@@ -88,64 +89,77 @@ export default function ActivityDetail() {
   const zone = getZoneLabel(activity.avgPace)
 
   const stats = [
-    { label: 'Distanza', value: formatDistance(activity.distance), color: 'text-gray-900' },
-    { label: 'Durata', value: formatDuration(activity.duration), color: 'text-gray-900' },
-    { label: 'Passo medio', value: activity.avgPace ? formatPace(activity.avgPace) + '/km' : '—', color: zone.text },
-    { label: 'FC media', value: activity.avgHeartRate ? Math.round(activity.avgHeartRate) + ' bpm' : '—', color: 'text-red-500' },
-    { label: 'FC max', value: activity.maxHeartRate ? Math.round(activity.maxHeartRate) + ' bpm' : '—', color: 'text-red-400' },
-    { label: 'Dislivello', value: activity.elevationGain > 0 ? '+' + Math.round(activity.elevationGain) + ' m' : '—', color: 'text-green-600' },
+    { label: 'Distanza',   value: formatDistance(activity.distance) },
+    { label: 'Durata',     value: formatDuration(activity.duration) },
+    { label: 'Passo medio', value: activity.avgPace ? formatPace(activity.avgPace) + '/km' : '—', color: zone.color },
+    { label: 'FC media',   value: activity.avgHeartRate ? Math.round(activity.avgHeartRate) + ' bpm' : '—', color: '#ef4444' },
+    { label: 'FC max',     value: activity.maxHeartRate ? Math.round(activity.maxHeartRate) + ' bpm' : '—', color: '#f87171' },
+    { label: 'Dislivello', value: activity.elevationGain > 0 ? '+' + Math.round(activity.elevationGain) + ' m' : '—', color: '#16a34a' },
   ]
 
   return (
-    <div className="space-y-5">
+    <div>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-gray-400">
-        <button onClick={() => router.push('/activities')} className="hover:text-gray-600 transition-colors">
-          Allenamenti
-        </button>
-        <span>/</span>
-        <span className="text-gray-700 font-medium truncate max-w-xs">{activity.name}</span>
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <Link href="/activities">
+              Allenamenti
+            </Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            <span className="text-truncate" style={{ maxWidth: '20rem', display: 'inline-block' }}>
+              {activity.name}
+            </span>
+          </li>
+        </ol>
       </nav>
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="d-flex justify-content-between align-items-start gap-3 mb-4">
         <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h1 className="text-2xl font-bold text-gray-900">{activity.name}</h1>
+          <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+            <h1 className="h4 fw-bold mb-0">{activity.name}</h1>
             {activity.label ? (
               (() => {
                 const ldef = LABELS.find((l) => l.value === activity.label)
                 return ldef ? (
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${ldef.bg} ${ldef.text}`}>
+                  <span
+                    className="badge rounded-pill fw-semibold"
+                    style={{ backgroundColor: ldef.color + '22', color: ldef.color, border: `1px solid ${ldef.color}55` }}
+                  >
                     {ldef.value}
                   </span>
                 ) : null
               })()
             ) : (
-              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${zone.bg} ${zone.text}`}>
+              <span
+                className="badge rounded-pill fw-semibold"
+                style={{ backgroundColor: zone.color + '22', color: zone.color, border: `1px solid ${zone.color}55` }}
+              >
                 {zone.label}
               </span>
             )}
           </div>
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted small mb-0">
             {formatDate(activity.date)}{activity.shoe ? ` · ${activity.shoe}` : ''}
           </p>
         </div>
-        <div className="shrink-0">
+        <div className="flex-shrink-0">
           {confirmDelete ? (
-            <div className="flex items-center gap-2">
+            <div className="d-flex align-items-center gap-2">
               <button
                 onClick={() => { deleteActivity(id); router.push('/activities') }}
-                className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                className="btn btn-danger btn-sm"
               >
                 Conferma
               </button>
-              <button onClick={() => setConfirmDelete(false)} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => setConfirmDelete(false)} className="btn btn-link btn-sm text-muted p-0">
                 Annulla
               </button>
             </div>
           ) : (
-            <button onClick={() => setConfirmDelete(true)} className="text-sm text-gray-400 hover:text-red-500 transition-colors">
+            <button onClick={() => setConfirmDelete(true)} className="btn btn-outline-danger btn-sm">
               Elimina
             </button>
           )}
@@ -153,108 +167,126 @@ export default function ActivityDetail() {
       </div>
 
       {/* Label selector */}
-      <div className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Etichetta</p>
-        <div className="flex flex-wrap gap-2">
-          {LABELS.map((l) => {
-            const active = activity.label === l.value
-            return (
-              <button
-                key={l.value}
-                onClick={() => setLabel(l.value)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                  active
-                    ? `${l.bg} ${l.text} border-transparent shadow-sm`
-                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700'
-                }`}
-              >
-                {l.value}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Shoe selector */}
-      <div className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Scarpe</p>
-        {availableShoes.length === 0 ? (
-          <p className="text-sm text-gray-400">Nessuna scarpa registrata</p>
-        ) : availableShoes.length <= 5 ? (
-          <div className="flex flex-wrap gap-2">
-            {availableShoes.map((shoe) => {
-              const active = activity.shoe === shoe
+      <div className="card border mb-3">
+        <div className="card-body py-3">
+          <p className="text-uppercase text-muted small fw-semibold mb-2" style={{ letterSpacing: '0.05em' }}>
+            Etichetta
+          </p>
+          <div className="d-flex flex-wrap gap-2">
+            {LABELS.map((l) => {
+              const active = activity.label === l.value
               return (
                 <button
-                  key={shoe}
-                  onClick={() => setShoe(shoe)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                    active
-                      ? 'bg-orange-500 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  key={l.value}
+                  onClick={() => setLabel(l.value)}
+                  className={`btn btn-sm rounded-pill ${active ? 'btn-brand' : 'btn-outline-secondary'}`}
+                  style={active ? { backgroundColor: l.color, borderColor: l.color, color: '#fff' } : undefined}
                 >
-                  {shoe}
+                  {l.value}
                 </button>
               )
             })}
           </div>
-        ) : (
-          <select
-            value={activity.shoe ?? ''}
-            onChange={(e) => setShoe(e.target.value || undefined)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
-          >
-            <option value="">-- Nessuna scarpa --</option>
-            {availableShoes.map((shoe) => (
-              <option key={shoe} value={shoe}>{shoe}</option>
-            ))}
-          </select>
-        )}
+        </div>
+      </div>
+
+      {/* Shoe selector */}
+      <div className="card border mb-3">
+        <div className="card-body py-3">
+          <p className="text-uppercase text-muted small fw-semibold mb-2" style={{ letterSpacing: '0.05em' }}>
+            Scarpe
+          </p>
+          {availableShoes.length === 0 ? (
+            <p className="text-muted small mb-0">Nessuna scarpa registrata</p>
+          ) : availableShoes.length <= 5 ? (
+            <div className="d-flex flex-wrap gap-2">
+              {availableShoes.map((shoe) => {
+                const active = activity.shoe === shoe
+                return (
+                  <button
+                    key={shoe}
+                    onClick={() => setShoe(shoe)}
+                    className={`btn btn-sm rounded-pill ${active ? 'btn-brand' : 'btn-outline-secondary'}`}
+                  >
+                    {shoe}
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <select
+              value={activity.shoe ?? ''}
+              onChange={(e) => setShoe(e.target.value || undefined)}
+              className="form-select form-select-sm w-auto"
+            >
+              <option value="">-- Nessuna scarpa --</option>
+              {availableShoes.map((shoe) => (
+                <option key={shoe} value={shoe}>{shoe}</option>
+              ))}
+            </select>
+          )}
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+      <div className="row g-2 mb-4">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-            <p className="text-xs text-gray-400 uppercase tracking-wide leading-none mb-2">{s.label}</p>
-            <p className={`text-lg font-bold leading-none ${s.color}`}>{s.value}</p>
+          <div key={s.label} className="col-4 col-md-2">
+            <div className="card border-0 bg-light text-center h-100">
+              <div className="card-body p-2">
+                <p className="text-uppercase text-muted mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.05em' }}>
+                  {s.label}
+                </p>
+                <p
+                  className="fw-bold mb-0"
+                  style={{ fontSize: '1.05rem', color: s.color ?? undefined }}
+                >
+                  {s.value}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
       {/* OSM Map */}
       {hasGps && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-800">Percorso</span>
-            <span className="text-xs text-gray-400">OpenStreetMap</span>
+        <div className="card mb-3">
+          <div className="card-header d-flex align-items-center gap-2 py-2">
+            <span className="fw-semibold small">Percorso</span>
+            <span className="text-muted" style={{ fontSize: '0.75rem' }}>OpenStreetMap</span>
           </div>
-          <LeafletMap points={stream!.latlng!} height={380} interactive />
+          <div className="card-body p-0" style={{ height: '350px', borderRadius: '0 0 0.375rem 0.375rem', overflow: 'hidden' }}>
+            <LeafletMap points={stream!.latlng!} height={350} interactive />
+          </div>
         </div>
       )}
 
       {/* Charts */}
       {chartData.length > 0 && (hasHR || hasPace) && (
-        <div className="bg-white rounded-2xl p-6 border border-gray-200">
-          <h2 className="font-semibold text-gray-800 mb-1">FC e Passo</h2>
-          <p className="text-xs text-gray-400 mb-4">
-            {hasHR && activity.avgHeartRate && `Media FC: ${Math.round(activity.avgHeartRate)} bpm · `}
-            {hasPace && activity.avgPace && `Passo medio: ${formatPace(activity.avgPace)}/km`}
-          </p>
-          <ActivityChart data={chartData} showHR={hasHR} showPace={hasPace} showAlt={false} />
+        <div className="card mb-3">
+          <div className="card-body">
+            <h2 className="h6 fw-semibold mb-1">FC e Passo</h2>
+            <p className="text-muted small mb-3">
+              {hasHR && activity.avgHeartRate && `Media FC: ${Math.round(activity.avgHeartRate)} bpm · `}
+              {hasPace && activity.avgPace && `Passo medio: ${formatPace(activity.avgPace)}/km`}
+            </p>
+            <ActivityChart data={chartData} showHR={hasHR} showPace={hasPace} showAlt={false} />
+          </div>
         </div>
       )}
 
       {chartData.length > 0 && hasAlt && (
-        <div className="bg-white rounded-2xl p-6 border border-gray-200">
-          <h2 className="font-semibold text-gray-800 mb-4">Altimetria</h2>
-          <ActivityChart data={chartData} showHR={false} showPace={false} showAlt={true} />
+        <div className="card mb-3">
+          <div className="card-body">
+            <h2 className="h6 fw-semibold mb-3">Altimetria</h2>
+            <ActivityChart data={chartData} showHR={false} showPace={false} showAlt={true} />
+          </div>
         </div>
       )}
 
       {!hasGps && chartData.length === 0 && (
-        <div className="bg-gray-50 rounded-xl p-8 text-center text-gray-400 text-sm border border-dashed border-gray-200">
+        <div className="text-center text-muted small p-5 border border-dashed rounded">
           Nessun dato GPS o stream per questa attività
         </div>
       )}

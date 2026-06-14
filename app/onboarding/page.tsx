@@ -12,13 +12,17 @@ const ONBOARDED_KEY = 'rd_onboarded_v1'
 // ─── Step indicators ────────────────────────────────────────────────────────
 function Dots({ step, total }: { step: number; total: number }) {
   return (
-    <div className="flex gap-2 justify-center">
+    <div className="d-flex gap-2 justify-content-center">
       {Array.from({ length: total }).map((_, i) => (
         <div
           key={i}
-          className={`h-1.5 rounded-full transition-all duration-300 ${
-            i === step ? 'w-6 bg-orange-400' : i < step ? 'w-1.5 bg-orange-300' : 'w-1.5 bg-gray-600'
-          }`}
+          style={{
+            height: '6px',
+            borderRadius: '9999px',
+            transition: 'all 0.3s',
+            width: i === step ? '24px' : '6px',
+            backgroundColor: i === step ? '#fb923c' : i < step ? '#fdba74' : '#4b5563',
+          }}
         />
       ))}
     </div>
@@ -28,35 +32,51 @@ function Dots({ step, total }: { step: number; total: number }) {
 // ─── Step 0: Splash ─────────────────────────────────────────────────────────
 function Splash({ onNext }: { onNext: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center px-8 space-y-10">
-      <div className="space-y-4">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <span className="text-orange-400 text-5xl leading-none">⬡</span>
+    <div
+      className="d-flex flex-column align-items-center justify-content-center text-center px-4"
+      style={{ minHeight: '100vh', gap: '2.5rem' }}
+    >
+      {/* Logo + title */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
+          <span style={{ color: '#f97316', fontSize: '3rem', lineHeight: 1 }}>⬡</span>
         </div>
-        <h1 className="text-5xl font-bold text-white tracking-tight">RunDash</h1>
-        <p className="text-gray-400 text-lg max-w-xs mx-auto leading-relaxed">
+        <h1 className="fw-bold text-white" style={{ fontSize: '3rem', letterSpacing: '-0.025em' }}>
+          RunDash
+        </h1>
+        <p style={{ color: '#9ca3af', fontSize: '1.125rem', maxWidth: '20rem', margin: '0 auto', lineHeight: 1.6 }}>
           La tua dashboard personale per gli allenamenti di corsa
         </p>
       </div>
 
-      <div className="space-y-3 text-sm text-gray-500 max-w-xs">
-        <div className="flex items-center gap-3">
-          <span className="text-orange-400 text-base">◆</span>
+      {/* Feature bullets */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', color: '#6b7280', maxWidth: '20rem' }}>
+        <div className="d-flex align-items-center gap-3">
+          <span style={{ color: '#f97316', fontSize: '1rem' }}>◆</span>
           <span>Zone di passo personalizzate</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-orange-400 text-base">◉</span>
+        <div className="d-flex align-items-center gap-3">
+          <span style={{ color: '#f97316', fontSize: '1rem' }}>◉</span>
           <span>Tracciamento corse e percorsi GPS</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-orange-400 text-base">◈</span>
+        <div className="d-flex align-items-center gap-3">
+          <span style={{ color: '#f97316', fontSize: '1rem' }}>◈</span>
           <span>Gestione scarpe e kilometraggio</span>
         </div>
       </div>
 
       <button
         onClick={onNext}
-        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-10 py-4 rounded-2xl text-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/25"
+        className="btn btn-warning fw-semibold"
+        style={{
+          padding: '1rem 2.5rem',
+          borderRadius: '1rem',
+          fontSize: '1.125rem',
+          backgroundColor: '#f97316',
+          border: 'none',
+          color: '#fff',
+          boxShadow: '0 8px 24px rgba(249,115,22,0.25)',
+        }}
       >
         Inizia →
       </button>
@@ -74,28 +94,47 @@ function StepCalculator({ onNext }: { onNext: (h: number, w: number, g: 'm' | 'f
   const aero = result.zones[1]
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-1">
-          <p className="text-orange-400 text-sm font-semibold uppercase tracking-widest">Passo 1 di 2</p>
-          <h2 className="text-2xl font-bold text-white">Il tuo profilo fisico</h2>
-          <p className="text-gray-400 text-sm">Calcoliamo le zone di allenamento ideali per te</p>
+    <div
+      className="d-flex flex-column align-items-center justify-content-center px-3"
+      style={{ minHeight: '100vh' }}
+    >
+      <div className="w-100" style={{ maxWidth: '28rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Header */}
+        <div className="text-center" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Passo 1 di 2
+          </p>
+          <h2 className="fw-bold text-white" style={{ fontSize: '1.5rem' }}>Il tuo profilo fisico</h2>
+          <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Calcoliamo le zone di allenamento ideali per te</p>
         </div>
 
-        <div className="bg-gray-800/60 backdrop-blur rounded-2xl border border-gray-700 p-6 space-y-5">
+        {/* Card inputs */}
+        <div
+          className="card border-secondary"
+          style={{ background: 'rgba(31,41,55,0.6)', backdropFilter: 'blur(8px)', borderRadius: '1rem', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+        >
           {/* Gender */}
           <div>
-            <label className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2 block">Sesso</label>
-            <div className="flex gap-2">
+            <label
+              style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+            >
+              Sesso
+            </label>
+            <div className="d-flex gap-2">
               {([['m', '♂ Uomo'], ['f', '♀ Donna']] as const).map(([v, l]) => (
                 <button
                   key={v}
                   onClick={() => setGender(v)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors ${
-                    gender === v
-                      ? 'border-orange-400 bg-orange-500/20 text-orange-300'
-                      : 'border-gray-600 text-gray-400 hover:border-gray-500'
-                  }`}
+                  className="flex-fill py-2 fw-semibold"
+                  style={{
+                    borderRadius: '0.75rem',
+                    fontSize: '0.875rem',
+                    border: `2px solid ${gender === v ? '#fb923c' : '#4b5563'}`,
+                    background: gender === v ? 'rgba(249,115,22,0.15)' : 'transparent',
+                    color: gender === v ? '#fdba74' : '#9ca3af',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer',
+                  }}
                 >
                   {l}
                 </button>
@@ -105,57 +144,82 @@ function StepCalculator({ onNext }: { onNext: (h: number, w: number, g: 'm' | 'f
 
           {/* Height */}
           <div>
-            <div className="flex justify-between mb-2">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wide">Altezza</label>
-              <span className="text-white font-bold text-sm">{height} cm</span>
+            <div className="d-flex justify-content-between mb-2">
+              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Altezza
+              </label>
+              <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{height} cm</span>
             </div>
             <input
               type="range" min={140} max={210} value={height}
               onChange={e => setHeight(Number(e.target.value))}
-              className="w-full accent-orange-500"
+              className="form-range w-100"
+              style={{ accentColor: '#f97316' }}
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-1">
+            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
               <span>140 cm</span><span>210 cm</span>
             </div>
           </div>
 
           {/* Weight */}
           <div>
-            <div className="flex justify-between mb-2">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wide">Peso</label>
-              <span className="text-white font-bold text-sm">{weight} kg</span>
+            <div className="d-flex justify-content-between mb-2">
+              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Peso
+              </label>
+              <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{weight} kg</span>
             </div>
             <input
               type="range" min={40} max={140} value={weight}
               onChange={e => setWeight(Number(e.target.value))}
-              className="w-full accent-orange-500"
+              className="form-range w-100"
+              style={{ accentColor: '#f97316' }}
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-1">
+            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
               <span>40 kg</span><span>140 kg</span>
             </div>
           </div>
         </div>
 
         {/* Live preview */}
-        <div className="bg-gray-800/40 rounded-xl border border-gray-700 p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Anteprima zone</p>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="text-center">
-              <p className="text-xs text-gray-500">VO₂max stimato</p>
-              <p className="text-xl font-bold text-white">{result.estimatedVO2max}</p>
-              <p className="text-xs text-gray-600">ml/kg/min</p>
+        <div
+          style={{
+            background: 'rgba(31,41,55,0.4)',
+            borderRadius: '0.75rem',
+            border: '1px solid #374151',
+            padding: '1rem',
+          }}
+        >
+          <p style={{ fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+            Anteprima zone
+          </p>
+          <div className="row g-2 text-center">
+            <div className="col-6">
+              <p style={{ fontSize: '0.7rem', color: '#6b7280' }}>VO₂max stimato</p>
+              <p className="text-white fw-bold" style={{ fontSize: '1.25rem' }}>{result.estimatedVO2max}</p>
+              <p style={{ fontSize: '0.7rem', color: '#4b5563' }}>ml/kg/min</p>
             </div>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">Zona aerobica</p>
-              <p className="text-xl font-bold text-blue-400">{formatPace(aero.paceMin)}–{formatPace(aero.paceMax)}</p>
-              <p className="text-xs text-gray-600">min/km</p>
+            <div className="col-6">
+              <p style={{ fontSize: '0.7rem', color: '#6b7280' }}>Zona aerobica</p>
+              <p className="fw-bold" style={{ fontSize: '1.25rem', color: '#60a5fa' }}>
+                {formatPace(aero.paceMin)}–{formatPace(aero.paceMax)}
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#4b5563' }}>min/km</p>
             </div>
           </div>
         </div>
 
         <button
           onClick={() => onNext(height, weight, gender)}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 rounded-xl transition-colors"
+          className="btn w-100 fw-semibold"
+          style={{
+            backgroundColor: '#f97316',
+            border: 'none',
+            color: '#fff',
+            padding: '0.875rem',
+            borderRadius: '0.75rem',
+            fontSize: '1rem',
+          }}
         >
           Avanti →
         </button>
@@ -190,30 +254,52 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-1">
-          <p className="text-orange-400 text-sm font-semibold uppercase tracking-widest">Passo 2 di 2</p>
-          <h2 className="text-2xl font-bold text-white">Le tue scarpe</h2>
-          <p className="text-gray-400 text-sm">Traccia il kilometraggio di ogni paio</p>
+    <div
+      className="d-flex flex-column align-items-center justify-content-center px-3"
+      style={{ minHeight: '100vh' }}
+    >
+      <div className="w-100" style={{ maxWidth: '28rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Header */}
+        <div className="text-center" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Passo 2 di 2
+          </p>
+          <h2 className="fw-bold text-white" style={{ fontSize: '1.5rem' }}>Le tue scarpe</h2>
+          <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Traccia il kilometraggio di ogni paio</p>
         </div>
 
-        <div className="bg-gray-800/60 backdrop-blur rounded-2xl border border-gray-700 overflow-hidden">
+        {/* Shoes card */}
+        <div
+          style={{
+            background: 'rgba(31,41,55,0.6)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '1rem',
+            border: '1px solid #374151',
+            overflow: 'hidden',
+          }}
+        >
           {shoes.length === 0 && !adding && (
-            <div className="px-6 py-8 text-center text-gray-500 text-sm">
+            <div className="text-center px-4 py-5" style={{ color: '#6b7280', fontSize: '0.875rem' }}>
               Nessuna scarpa aggiunta
             </div>
           )}
 
           {shoes.map(s => (
-            <div key={s.id} className="flex items-center justify-between px-5 py-3.5 border-b border-gray-700 last:border-0">
+            <div
+              key={s.id}
+              className="d-flex align-items-center justify-content-between px-4"
+              style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid #374151' }}
+            >
               <div>
-                <p className="text-white font-medium text-sm">{s.displayName}</p>
-                <p className="text-gray-500 text-xs">{s.brand}</p>
+                <p className="text-white fw-medium mb-0" style={{ fontSize: '0.875rem' }}>{s.displayName}</p>
+                <p style={{ color: '#6b7280', fontSize: '0.75rem', marginBottom: 0 }}>{s.brand}</p>
               </div>
               <button
                 onClick={() => removeShoe(s.id)}
-                className="text-gray-600 hover:text-red-400 transition-colors text-sm px-2 py-1"
+                className="btn btn-link p-1"
+                style={{ color: '#4b5563', fontSize: '0.875rem', textDecoration: 'none' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
               >
                 ✕
               </button>
@@ -221,28 +307,61 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
           ))}
 
           {adding ? (
-            <div className="p-4 border-t border-gray-700 space-y-3">
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  autoFocus
-                  placeholder="Marca (Nike)"
-                  value={brand}
-                  onChange={e => setBrand(e.target.value)}
-                  className="bg-gray-700 text-white text-sm px-3 py-2 rounded-lg border border-gray-600 placeholder-gray-500 focus:outline-none focus:border-orange-400"
-                />
-                <input
-                  placeholder="Modello (Pegasus)"
-                  value={model}
-                  onChange={e => setModel(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addShoe()}
-                  className="bg-gray-700 text-white text-sm px-3 py-2 rounded-lg border border-gray-600 placeholder-gray-500 focus:outline-none focus:border-orange-400"
-                />
+            <div style={{ padding: '1rem', borderTop: '1px solid #374151', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div className="row g-2">
+                <div className="col-6">
+                  <input
+                    autoFocus
+                    placeholder="Marca (Nike)"
+                    value={brand}
+                    onChange={e => setBrand(e.target.value)}
+                    className="form-control"
+                    style={{
+                      background: '#374151',
+                      color: '#fff',
+                      border: '1px solid #4b5563',
+                      fontSize: '0.875rem',
+                      borderRadius: '0.5rem',
+                    }}
+                  />
+                </div>
+                <div className="col-6">
+                  <input
+                    placeholder="Modello (Pegasus)"
+                    value={model}
+                    onChange={e => setModel(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && addShoe()}
+                    className="form-control"
+                    style={{
+                      background: '#374151',
+                      color: '#fff',
+                      border: '1px solid #4b5563',
+                      fontSize: '0.875rem',
+                      borderRadius: '0.5rem',
+                    }}
+                  />
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={addShoe} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+              <div className="d-flex gap-2">
+                <button
+                  onClick={addShoe}
+                  className="btn flex-fill fw-medium"
+                  style={{
+                    backgroundColor: '#f97316',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '0.875rem',
+                    padding: '0.5rem',
+                    borderRadius: '0.5rem',
+                  }}
+                >
                   Aggiungi
                 </button>
-                <button onClick={() => { setAdding(false); setBrand(''); setModel('') }} className="px-4 text-gray-400 hover:text-gray-300 text-sm transition-colors">
+                <button
+                  onClick={() => { setAdding(false); setBrand(''); setModel('') }}
+                  className="btn btn-link px-3"
+                  style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}
+                >
                   Annulla
                 </button>
               </div>
@@ -250,23 +369,58 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
           ) : (
             <button
               onClick={() => setAdding(true)}
-              className="w-full px-5 py-3 text-sm text-orange-400 hover:text-orange-300 hover:bg-gray-700/50 transition-colors text-left border-t border-gray-700 first:border-0"
+              className="btn btn-link w-100 text-start"
+              style={{
+                color: '#fb923c',
+                fontSize: '0.875rem',
+                padding: '0.875rem 1.25rem',
+                borderTop: shoes.length > 0 ? '1px solid #374151' : 'none',
+                textDecoration: 'none',
+                borderRadius: 0,
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#fdba74'
+                e.currentTarget.style.background = 'rgba(55,65,81,0.5)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#fb923c'
+                e.currentTarget.style.background = 'transparent'
+              }}
             >
               + Aggiungi scarpa
             </button>
           )}
         </div>
 
-        <div className="flex gap-3">
+        {/* Footer actions */}
+        <div className="d-flex gap-3">
           <button
             onClick={() => onFinish([])}
-            className="flex-1 py-3.5 rounded-xl border border-gray-600 text-gray-400 hover:text-gray-300 hover:border-gray-500 text-sm font-medium transition-colors"
+            className="btn flex-fill fw-medium"
+            style={{
+              padding: '0.875rem',
+              borderRadius: '0.75rem',
+              border: '1px solid #4b5563',
+              color: '#9ca3af',
+              background: 'transparent',
+              fontSize: '0.875rem',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.borderColor = '#6b7280' }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.borderColor = '#4b5563' }}
           >
             Salta
           </button>
           <button
             onClick={() => onFinish(shoes)}
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 rounded-xl transition-colors text-sm"
+            className="btn flex-fill fw-semibold"
+            style={{
+              backgroundColor: '#f97316',
+              border: 'none',
+              color: '#fff',
+              padding: '0.875rem',
+              borderRadius: '0.75rem',
+              fontSize: '0.875rem',
+            }}
           >
             {shoes.length > 0 ? `Salva ${shoes.length} scarpe →` : 'Continua →'}
           </button>
@@ -306,22 +460,55 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-950 overflow-y-auto">
-      {/* Ambient gradient */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
+    <div
+      style={{ background: '#030712', minHeight: '100vh', position: 'fixed', inset: 0, overflowY: 'auto' }}
+    >
+      {/* Ambient gradient blobs */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '24rem',
+            height: '24rem',
+            background: 'rgba(249,115,22,0.08)',
+            borderRadius: '9999px',
+            filter: 'blur(64px)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: '16rem',
+            height: '16rem',
+            background: 'rgba(59,130,246,0.04)',
+            borderRadius: '9999px',
+            filter: 'blur(64px)',
+          }}
+        />
       </div>
 
       {/* Step dots (hidden on splash) */}
       {step > 0 && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-10">
+        <div
+          style={{
+            position: 'fixed',
+            top: '1.5rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10,
+          }}
+        >
           <Dots step={step - 1} total={2} />
         </div>
       )}
 
       {/* Steps */}
-      <div className="relative z-10">
+      <div style={{ position: 'relative', zIndex: 10 }}>
         {step === 0 && <Splash onNext={() => setStep(1)} />}
         {step === 1 && <StepCalculator onNext={handleCalcNext} />}
         {step === 2 && <StepShoes onFinish={handleShoesFinish} />}

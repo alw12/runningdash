@@ -40,33 +40,34 @@ export default function RoutesPage() {
   ]
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="d-flex flex-column gap-4">
+      {/* Header + search */}
+      <div className="d-flex align-items-center justify-content-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Percorsi</h1>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <h1 className="h4 fw-bold mb-0">Percorsi</h1>
+          <p className="text-muted small mb-0">
             {withGps.length} con mappa GPS
             {withoutGps.length > 0 && ` · ${withoutGps.length} senza GPS`}
           </p>
         </div>
         <input
           type="text"
-          placeholder="Cerca…"
+          placeholder="Cerca percorso..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-orange-400 w-40 transition-colors"
+          className="form-control"
+          style={{ maxWidth: '180px' }}
         />
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+      <div className="btn-group" role="group" aria-label="Filtro percorsi">
         {FILTERS.map((f) => (
           <button
             key={f.key}
+            type="button"
             onClick={() => setFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              filter === f.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-            }`}
+            className={`btn btn-sm ${filter === f.key ? 'btn-dark' : 'btn-outline-secondary'}`}
           >
             {f.label}
           </button>
@@ -74,81 +75,92 @@ export default function RoutesPage() {
       </div>
 
       {routes.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-gray-200">
-          <p className="text-4xl mb-3">🗺️</p>
-          <p className="text-gray-700 font-medium mb-1">Nessun percorso</p>
-          <p className="text-gray-400 text-sm">
-            Importa file GPX dalla <Link href="/" className="text-orange-500 hover:underline">dashboard</Link>
-          </p>
+        <div className="card text-center py-5">
+          <div className="card-body">
+            <p className="fs-1 mb-2">🗺️</p>
+            <p className="fw-medium mb-1">Nessun percorso</p>
+            <p className="text-muted small mb-0">
+              Importa file GPX dalla <Link href="/" className="text-warning text-decoration-none">dashboard</Link>
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="row g-3">
           {filtered.map(({ activity: a, stream }) => {
             const zone = getZoneLabel(a.avgPace)
             return (
-              <Link
-                key={a.id}
-                href={`/activities/${a.id}`}
-                className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-orange-300 hover:shadow-md transition-all group"
-              >
-                <div className="bg-gray-50 p-3">
-                  <RouteMap
-                    points={stream?.latlng ?? []}
-                    width={320}
-                    height={150}
-                    strokeColor={zone.color}
-                    className="w-full"
-                  />
-                </div>
-                <div className="px-4 py-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-gray-900 text-sm group-hover:text-orange-500 transition-colors leading-tight">
-                      {a.name}
-                    </p>
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0 ${zone.bg} ${zone.text}`}>
-                      {zone.label}
-                    </span>
+              <div key={a.id} className="col-6 col-md-4 col-lg-3">
+                <Link
+                  href={`/activities/${a.id}`}
+                  className="text-decoration-none d-block h-100"
+                >
+                  <div className="card h-100 shadow-sm route-card">
+                    <div className="bg-light p-2">
+                      <RouteMap
+                        points={stream?.latlng ?? []}
+                        width={320}
+                        height={150}
+                        strokeColor={zone.color}
+                        className="w-100"
+                      />
+                    </div>
+                    <div className="card-body py-2 px-3">
+                      <div className="d-flex align-items-start justify-content-between gap-2 mb-1">
+                        <p className="fw-semibold small text-dark mb-0 lh-sm route-card-name">
+                          {a.name}
+                        </p>
+                        <span
+                          className="badge fw-medium flex-shrink-0"
+                          style={{ fontSize: '0.65rem', backgroundColor: 'transparent', border: '1px solid currentColor' }}
+                        >
+                          {zone.label}
+                        </span>
+                      </div>
+                      <p className="small text-muted mb-1">{formatDate(a.date)}</p>
+                      <div className="d-flex gap-2 small">
+                        <span className="fw-bold text-dark">{formatDistance(a.distance)}</span>
+                        {a.avgPace && (
+                          <span className="fw-semibold" style={{ color: zone.color }}>
+                            {formatPace(a.avgPace)}/km
+                          </span>
+                        )}
+                        {a.avgHeartRate && (
+                          <span className="text-danger">{Math.round(a.avgHeartRate)} bpm</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5">{formatDate(a.date)}</p>
-                  <div className="flex gap-3 mt-2 text-xs">
-                    <span className="font-bold text-gray-800">{formatDistance(a.distance)}</span>
-                    {a.avgPace && (
-                      <span className="font-semibold" style={{ color: zone.color }}>
-                        {formatPace(a.avgPace)}/km
-                      </span>
-                    )}
-                    {a.avgHeartRate && (
-                      <span className="text-red-500">{Math.round(a.avgHeartRate)} bpm</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             )
           })}
         </div>
       )}
 
       {withoutGps.length > 0 && withGps.length > 0 && (
-        <details className="bg-gray-50 rounded-xl border border-gray-200">
-          <summary className="px-5 py-3 text-sm font-medium text-gray-600 cursor-pointer select-none">
+        <details className="card border">
+          <summary className="card-header small fw-medium text-muted" style={{ cursor: 'pointer', userSelect: 'none' }}>
             Senza GPS ({withoutGps.length})
           </summary>
-          <div className="border-t border-gray-200 divide-y divide-gray-100">
+          <div className="list-group list-group-flush">
             {withoutGps.map(({ activity: a }) => {
               const zone = getZoneLabel(a.avgPace)
               return (
                 <Link
                   key={a.id}
                   href={`/activities/${a.id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-gray-100 transition-colors"
+                  className="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-2 px-3"
                 >
                   <div>
-                    <span className="text-sm text-gray-700 font-medium">{a.name}</span>
-                    <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${zone.bg} ${zone.text}`}>
+                    <span className="small fw-medium text-dark">{a.name}</span>
+                    <span
+                      className="badge ms-2 fw-medium"
+                      style={{ fontSize: '0.65rem', backgroundColor: 'transparent', border: '1px solid currentColor', color: zone.color }}
+                    >
                       {zone.label}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400">{formatDate(a.date)} · {formatDistance(a.distance)}</span>
+                  <span className="small text-muted">{formatDate(a.date)} · {formatDistance(a.distance)}</span>
                 </Link>
               )
             })}

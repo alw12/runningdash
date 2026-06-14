@@ -48,9 +48,9 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload || payload.length === 0) return null
   const km = payload[0].value ?? 0
   return (
-    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-md text-sm">
-      <p className="font-medium text-gray-700">{String(label ?? '')}</p>
-      <p className="text-orange-500 font-semibold">{km.toFixed(2)} km</p>
+    <div className="bg-white border rounded px-3 py-2 shadow-sm" style={{ fontSize: '0.875rem' }}>
+      <p className="fw-medium text-secondary mb-0">{String(label ?? '')}</p>
+      <p className="fw-semibold mb-0" style={{ color: '#f97316' }}>{km.toFixed(2)} km</p>
     </div>
   )
 }
@@ -225,150 +225,151 @@ export function KmChart({ activities }: KmChartProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-        <h2 className="font-semibold text-gray-800">Chilometri</h2>
+    <div className="card">
+      <div className="card-body">
+        {/* Header */}
+        <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2 mb-3">
+          <h2 className="h6 fw-semibold mb-0">Chilometri</h2>
 
-        {/* Tab selector */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 self-start sm:self-auto">
-          {TAB_LABELS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => handleSetVista(key)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                vista === key
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Selettore mese/anno (solo vista giornaliera) */}
-      {vista === 'giornaliero' && (
-        <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={prevMonth}
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors text-base font-bold"
-            aria-label="Mese precedente"
-          >
-            ‹
-          </button>
-          <span className="text-sm font-medium text-gray-700 min-w-[130px] text-center">
-            {MONTH_NAMES[selectedMonth]} {selectedYear}
-          </span>
-          <button
-            onClick={nextMonth}
-            disabled={isCurrentMonth}
-            className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors text-base font-bold ${
-              isCurrentMonth
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'hover:bg-gray-100 text-gray-500 hover:text-gray-800'
-            }`}
-            aria-label="Mese successivo"
-          >
-            ›
-          </button>
-        </div>
-      )}
-
-      {/* Chart */}
-      {vista === 'giornaliero' && (() => {
-        const data = buildGiornalieroData(activities, selectedYear, selectedMonth)
-        return (
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis
-                dataKey="giorno"
-                tick={{ fontSize: 10 }}
-                interval={1}
-              />
-              <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
-              <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
-                {data.map((_, i) => (
-                  <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )
-      })()}
-
-      {vista === 'settimanale' && (() => {
-        const data = buildSettimanaleData(activities)
-        return (
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis dataKey="settimana" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
-              <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
-                {data.map((_, i) => (
-                  <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )
-      })()}
-
-      {vista === 'mensile' && (() => {
-        const data = buildMensileData(activities)
-        return (
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-              <XAxis dataKey="mese" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
-              <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
-                {data.map((_, i) => (
-                  <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )
-      })()}
-
-      {/* Mini-lista attività del periodo selezionato */}
-      {selectedIdx !== null && (
-        selectedActivities.length > 0 ? (
-          <div className="mt-4 border-t border-gray-100 pt-4">
-            <p className="text-xs text-gray-500 mb-2">Attività in questo periodo:</p>
-            {selectedActivities.map((a) => (
-              <a
-                key={a.id}
-                href={`/activities/${a.id}`}
-                className="flex items-center justify-between py-2 hover:bg-gray-50 rounded px-2 group"
-              >
-                <span className="text-sm font-medium text-slate-900 group-hover:text-orange-600">
-                  {a.name}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {(a.distance / 1000).toFixed(1)} km
-                  {' · '}
-                  {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
-                  {' · '}
-                  {formatDuration(a.duration)}
-                </span>
-              </a>
+          {/* Tab selector */}
+          <ul className="nav nav-tabs border-0 mb-0">
+            {TAB_LABELS.map(({ key, label }) => (
+              <li className="nav-item" key={key}>
+                <button
+                  className={`nav-link${vista === key ? ' active' : ''}`}
+                  onClick={() => handleSetVista(key)}
+                >
+                  {label}
+                </button>
+              </li>
             ))}
+          </ul>
+        </div>
+
+        {/* Selettore mese/anno (solo vista giornaliera) */}
+        {vista === 'giornaliero' && (
+          <div className="d-flex align-items-center gap-2 mb-3">
+            <button
+              onClick={prevMonth}
+              className="btn btn-sm btn-outline-secondary"
+              aria-label="Mese precedente"
+              style={{ width: '1.75rem', height: '1.75rem', padding: 0, lineHeight: 1 }}
+            >
+              ‹
+            </button>
+            <span className="small fw-medium text-center" style={{ minWidth: '130px' }}>
+              {MONTH_NAMES[selectedMonth]} {selectedYear}
+            </span>
+            <button
+              onClick={nextMonth}
+              disabled={isCurrentMonth}
+              className="btn btn-sm btn-outline-secondary"
+              aria-label="Mese successivo"
+              style={{ width: '1.75rem', height: '1.75rem', padding: 0, lineHeight: 1 }}
+            >
+              ›
+            </button>
           </div>
-        ) : (
-          <p className="text-xs text-gray-400 mt-4 text-center">Nessuna attività in questo periodo</p>
-        )
-      )}
+        )}
+
+        {/* Chart */}
+        <div className="mt-2">
+          {vista === 'giornaliero' && (() => {
+            const data = buildGiornalieroData(activities, selectedYear, selectedMonth)
+            return (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis
+                    dataKey="giorno"
+                    tick={{ fontSize: 10 }}
+                    interval={1}
+                  />
+                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
+                  <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
+                    {data.map((_, i) => (
+                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )
+          })()}
+
+          {vista === 'settimanale' && (() => {
+            const data = buildSettimanaleData(activities)
+            return (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis dataKey="settimana" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
+                  <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
+                    {data.map((_, i) => (
+                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )
+          })()}
+
+          {vista === 'mensile' && (() => {
+            const data = buildMensileData(activities)
+            return (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis dataKey="mese" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
+                  <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
+                    {data.map((_, i) => (
+                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )
+          })()}
+        </div>
+
+        {/* Mini-lista attività del periodo selezionato */}
+        {selectedIdx !== null && (
+          selectedActivities.length > 0 ? (
+            <div className="mt-3 border-top pt-3">
+              <p className="text-muted small mb-2">Attività in questo periodo:</p>
+              <div className="list-group list-group-flush">
+                {selectedActivities.map((a) => (
+                  <a
+                    key={a.id}
+                    href={`/activities/${a.id}`}
+                    className="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-2 px-2"
+                  >
+                    <span className="small fw-medium text-dark">
+                      {a.name}
+                    </span>
+                    <span className="small text-muted">
+                      {(a.distance / 1000).toFixed(1)} km
+                      {' · '}
+                      {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
+                      {' · '}
+                      {formatDuration(a.duration)}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted small text-center mt-3">Nessuna attività in questo periodo</p>
+          )
+        )}
+      </div>
     </div>
   )
 }

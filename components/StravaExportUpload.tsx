@@ -45,26 +45,26 @@ export function StravaExportUpload({ onImport, compact }: StravaExportUploadProp
 
   if (compact) {
     return (
-      <div className="flex gap-2">
+      <div className="d-flex gap-2 align-items-center flex-wrap">
         <button
           onClick={() => csvRef.current?.click()}
           disabled={loading}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          className="btn btn-brand d-flex align-items-center gap-2"
         >
           <span>🟠</span> Importa CSV
         </button>
-        <input ref={csvRef} type="file" accept=".csv" className="hidden"
+        <input ref={csvRef} type="file" accept=".csv" className="d-none"
           onChange={(e) => handleCSV(e.target.files?.[0] ?? null)} />
         <button
           onClick={() => shoesRef.current?.click()}
-          className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="btn btn-secondary d-flex align-items-center gap-2"
         >
           <span>👟</span> Importa Scarpe
         </button>
-        <input ref={shoesRef} type="file" accept=".csv" className="hidden"
+        <input ref={shoesRef} type="file" accept=".csv" className="d-none"
           onChange={(e) => handleShoes(e.target.files?.[0] ?? null)} />
         {status && (
-          <span className="text-sm text-green-600 flex items-center">
+          <span className={`small ${status.error ? 'text-danger' : 'text-success'}`}>
             {status.error ?? `✓ ${status.count} corse${status.shoes ? `, ${status.shoes} scarpe` : ''}`}
           </span>
         )}
@@ -73,47 +73,51 @@ export function StravaExportUpload({ onImport, compact }: StravaExportUploadProp
   }
 
   return (
-    <div className="space-y-3">
+    <div>
+      {/* Drag area: Strava activities CSV */}
       <div
-        className="border-2 border-dashed border-orange-200 rounded-xl p-6 text-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-colors"
+        className="border border-2 border-warning rounded-3 p-4 text-center mb-3"
+        style={{ cursor: 'pointer', borderStyle: 'dashed' }}
         onClick={() => !loading && csvRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleCSV(e.dataTransfer.files[0]) }}
       >
-        <input ref={csvRef} type="file" accept=".csv" className="hidden"
+        <input ref={csvRef} type="file" accept=".csv" className="d-none"
           onChange={(e) => handleCSV(e.target.files?.[0] ?? null)} />
-        <div className="text-2xl mb-1">🟠</div>
+        <div className="fs-2 mb-1">🟠</div>
         {loading ? (
-          <p className="text-orange-600 font-medium text-sm">Importazione…</p>
+          <p className="text-warning fw-semibold mb-0">Importazione…</p>
         ) : (
           <>
-            <p className="text-gray-700 font-medium text-sm">activities.csv da Strava</p>
-            <p className="text-gray-400 text-xs mt-1">Export dati → ZIP → activities.csv</p>
+            <p className="fw-semibold text-secondary mb-1 small">activities.csv da Strava</p>
+            <div className="alert alert-warning py-1 px-2 mb-0 small">
+              Export dati → ZIP → activities.csv
+            </div>
           </>
         )}
       </div>
 
+      {/* Drag area: scarpe CSV */}
       <div
-        className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
+        className="border border-2 border-secondary rounded-3 p-3 text-center mb-3"
+        style={{ cursor: 'pointer', borderStyle: 'dashed' }}
         onClick={() => shoesRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleShoes(e.dataTransfer.files[0]) }}
       >
-        <input ref={shoesRef} type="file" accept=".csv" className="hidden"
+        <input ref={shoesRef} type="file" accept=".csv" className="d-none"
           onChange={(e) => handleShoes(e.target.files?.[0] ?? null)} />
-        <p className="text-gray-600 text-sm font-medium">👟 shoes.csv da Strava</p>
-        <p className="text-gray-400 text-xs mt-0.5">Stesso export ZIP</p>
+        <p className="text-secondary fw-semibold small mb-1">👟 shoes.csv da Strava</p>
+        <small className="text-muted">Stesso export ZIP</small>
       </div>
 
       {(status?.count ?? 0) > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">
+        <div className="alert alert-success mt-2 py-2">
           ✓ {status?.count} corse{status?.shoes ? `, ${status.shoes} scarpe` : ''} importate
         </div>
       )}
       {status?.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm text-red-700">
-          {status.error}
-        </div>
+        <div className="alert alert-danger mt-2 py-2">{status.error}</div>
       )}
     </div>
   )

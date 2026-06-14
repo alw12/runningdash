@@ -50,9 +50,9 @@ function computePaceTrend(runs: Activity[]): 'up' | 'down' | 'neutral' {
 }
 
 function TrendArrow({ trend }: { trend: 'up' | 'down' | 'neutral' }) {
-  if (trend === 'up') return <span className="text-emerald-500 font-bold text-base leading-none" title="Miglioramento nelle ultime 3 corse">↑</span>
-  if (trend === 'down') return <span className="text-red-500 font-bold text-base leading-none" title="Peggioramento nelle ultime 3 corse">↓</span>
-  return <span className="text-gray-400 font-bold text-sm leading-none" title="Andamento stabile">–</span>
+  if (trend === 'up') return <span className="fw-bold text-success" title="Miglioramento nelle ultime 3 corse">&#8593;</span>
+  if (trend === 'down') return <span className="fw-bold text-danger" title="Peggioramento nelle ultime 3 corse">&#8595;</span>
+  return <span className="fw-bold text-secondary" title="Andamento stabile">&ndash;</span>
 }
 
 export default function SegmentsPage() {
@@ -94,18 +94,18 @@ export default function SegmentsPage() {
     .filter((_, i) => i % 3 === 0) // downsample
 
   return (
-    <div className="space-y-5">
+    <div className="d-flex flex-column gap-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Segmenti</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
-            Zone abituali rilevate automaticamente · {clusters.length} zone
+          <h1 className="h4 fw-bold mb-0">Segmenti</h1>
+          <p className="text-muted small mb-0">
+            Zone abituali rilevate automaticamente &middot; {clusters.length} zone
           </p>
         </div>
         <button
           onClick={() => fileRef.current?.click()}
-          className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 transition-colors"
+          className="btn btn-sm btn-outline-secondary"
         >
           + local_legend_segments.csv
         </button>
@@ -113,22 +113,22 @@ export default function SegmentsPage() {
           ref={fileRef}
           type="file"
           accept=".csv"
-          className="hidden"
+          className="d-none"
           onChange={(e) => handleLegendFile(e.target.files?.[0] ?? null)}
         />
       </div>
 
       {/* Empty state */}
       {clusters.length === 0 ? (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-700">
-          <p className="text-4xl mb-3">📍</p>
-          <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">Nessun dato GPS</p>
-          <p className="text-gray-400 dark:text-gray-500 text-sm">
-            Importa <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">All_Runs.gpx</code> per rilevare zone abituali
+        <div className="text-center py-5 text-muted border rounded-3">
+          <p className="fs-1 mb-2">&#128205;</p>
+          <p className="fw-semibold text-body mb-1">Nessun dato GPS</p>
+          <p className="small mb-0">
+            Importa <code>All_Runs.gpx</code> per rilevare zone abituali
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="d-flex flex-column gap-3">
           {clusters.map((c) => {
             const isOpen = expanded === c.id
             const sample = c.runs[0]
@@ -162,114 +162,116 @@ export default function SegmentsPage() {
             return (
               <div
                 key={c.id}
-                className="bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="card mb-3 shadow-sm overflow-hidden"
               >
                 {/* Card header — clickable */}
                 <button
-                  className="w-full flex items-start gap-4 p-5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
+                  className="btn btn-link text-decoration-none text-start w-100 p-0"
                   onClick={() => setExpanded(isOpen ? null : c.id)}
                 >
-                  {/* Route thumbnail */}
-                  <div className="shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mt-0.5">
-                    <RouteMap
-                      points={sampleStream?.latlng ?? []}
-                      width={88}
-                      height={66}
-                      strokeWidth={1.8}
-                      strokeColor={strokeColor}
-                    />
-                  </div>
-
-                  {/* Main info */}
-                  <div className="flex-1 min-w-0">
-                    {/* Zone name + legend badge */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight truncate">
-                        {c.label}
-                      </p>
-                      {legend && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-700">
-                          🏆 Local Legend
-                        </span>
-                      )}
+                  <div className="card-body d-flex align-items-start gap-3">
+                    {/* Route thumbnail */}
+                    <div className="flex-shrink-0 rounded overflow-hidden border">
+                      <RouteMap
+                        points={sampleStream?.latlng ?? []}
+                        width={88}
+                        height={66}
+                        strokeWidth={1.8}
+                        strokeColor={strokeColor}
+                      />
                     </div>
 
-                    {/* Activity type badges */}
-                    <div className="flex items-center gap-2 mt-1.5">
-                      {runsCount > 0 && (
-                        <span className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-0.5 rounded-full font-medium">
-                          {runsCount} {runsCount === 1 ? 'corsa' : 'corse'}
-                        </span>
-                      )}
-                      {walksCount > 0 && (
-                        <span className="text-xs text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full font-medium">
-                          {walksCount} {walksCount === 1 ? 'passeggiata' : 'passeggiate'}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Stats row */}
-                    <div className="flex items-center gap-4 mt-2.5 flex-wrap">
-                      {/* Avg distance */}
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Media km</span>
-                        <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDistance(avgDist)}</span>
+                    {/* Main info */}
+                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                      {/* Zone name + legend badge */}
+                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <p className="fw-bold text-body mb-0 text-truncate">
+                          {c.label}
+                        </p>
+                        {legend && (
+                          <span className="badge bg-warning text-dark ms-1">
+                            &#127942; Local Legend
+                          </span>
+                        )}
                       </div>
 
-                      {/* Avg pace — runs only */}
-                      {avgPace !== null && (
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Passo medio</span>
-                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatPace(avgPace)} /km</span>
+                      {/* Activity type badges */}
+                      <div className="d-flex align-items-center gap-2 mt-1">
+                        {runsCount > 0 && (
+                          <span className="badge rounded-pill" style={{ backgroundColor: '#fff3e0', color: '#e65100', border: '1px solid #ffcc80' }}>
+                            {runsCount} {runsCount === 1 ? 'corsa' : 'corse'}
+                          </span>
+                        )}
+                        {walksCount > 0 && (
+                          <span className="badge rounded-pill" style={{ backgroundColor: '#f3e5f5', color: '#6a1b9a', border: '1px solid #ce93d8' }}>
+                            {walksCount} {walksCount === 1 ? 'passeggiata' : 'passeggiate'}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Stats row */}
+                      <div className="d-flex align-items-center gap-4 mt-2 flex-wrap">
+                        {/* Avg distance */}
+                        <div className="d-flex flex-column">
+                          <span className="text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Media km</span>
+                          <span className="fw-semibold small text-body">{formatDistance(avgDist)}</span>
                         </div>
-                      )}
 
-                      {/* Trend */}
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Trend</span>
-                        <div className="flex items-center gap-1">
-                          <TrendArrow trend={trend} />
-                          <span className="text-xs text-gray-400 dark:text-gray-500">ultime 3</span>
+                        {/* Avg pace — runs only */}
+                        {avgPace !== null && (
+                          <div className="d-flex flex-column">
+                            <span className="text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Passo medio</span>
+                            <span className="fw-semibold small text-body">{formatPace(avgPace)} /km</span>
+                          </div>
+                        )}
+
+                        {/* Trend */}
+                        <div className="d-flex flex-column">
+                          <span className="text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trend</span>
+                          <div className="d-flex align-items-center gap-1">
+                            <TrendArrow trend={trend} />
+                            <span className="text-muted" style={{ fontSize: '0.75rem' }}>ultime 3</span>
+                          </div>
+                        </div>
+
+                        {/* Last run */}
+                        <div className="d-flex flex-column">
+                          <span className="text-muted" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ultima</span>
+                          <span className="fw-semibold small text-body">{formatDate(c.lastRun)}</span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Last run */}
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide">Ultima</span>
-                        <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDate(c.lastRun)}</span>
+                    {/* Right: activity count + chevron */}
+                    <div className="flex-shrink-0 d-flex flex-column align-items-end gap-2">
+                      <div className="text-end">
+                        <p className="fw-bold fs-4 mb-0" style={{ color: '#f97316', lineHeight: 1 }}>{c.runs.length}</p>
+                        <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>attività</p>
                       </div>
+                      <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        {isOpen ? '▲' : '▼'}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Right: activity count + chevron */}
-                  <div className="shrink-0 flex flex-col items-end gap-2">
-                    <div className="text-right">
-                      <p className="text-2xl font-extrabold text-orange-500 leading-none">{c.runs.length}</p>
-                      <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">attività</p>
-                    </div>
-                    <span className="text-gray-300 dark:text-gray-600 text-xs mt-1">
-                      {isOpen ? '▲' : '▼'}
-                    </span>
                   </div>
                 </button>
 
                 {/* Expanded section */}
                 {isOpen && (
-                  <div className="border-t-2 border-gray-100 dark:border-gray-700">
+                  <div className="border-top">
                     {/* OSM map */}
                     {allPoints.length > 1 && (
                       <LeafletMap points={allPoints} height={260} interactive />
                     )}
 
                     {/* Run list */}
-                    <div className="divide-y divide-gray-50 dark:divide-gray-800">
+                    <div className="list-group list-group-flush border-top">
                       {/* Column headers */}
-                      <div className="hidden sm:flex items-center px-5 py-2 text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
-                        <span className="flex-1">Corsa</span>
-                        <div className="flex items-center gap-6 text-right">
-                          <span className="w-16">Distanza</span>
-                          <span className="w-16">Passo</span>
-                          <span className="w-16">Durata</span>
+                      <div className="d-none d-sm-flex align-items-center px-3 py-2 bg-light text-muted" style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        <span className="flex-grow-1">Corsa</span>
+                        <div className="d-flex align-items-center gap-4 text-end">
+                          <span style={{ width: '4rem' }}>Distanza</span>
+                          <span style={{ width: '4rem' }}>Passo</span>
+                          <span style={{ width: '4rem' }}>Durata</span>
                         </div>
                       </div>
 
@@ -279,51 +281,59 @@ export default function SegmentsPage() {
                           <Link
                             key={a.id}
                             href={`/activities/${a.id}`}
-                            className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors group"
+                            className="list-group-item list-group-item-action d-flex align-items-center gap-3 px-3 py-2 text-decoration-none"
                           >
                             {/* Date + zone badge */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-0.5">
-                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${z.bg} ${z.text}`}>
+                            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                              <div className="d-flex align-items-center gap-2 mb-1">
+                                <span
+                                  className="badge"
+                                  style={{
+                                    backgroundColor: z.color + '22',
+                                    color: z.color,
+                                    border: `1px solid ${z.color}44`,
+                                    fontSize: '0.7rem',
+                                  }}
+                                >
                                   {z.label}
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(a.date)}</p>
+                              <p className="text-muted mb-0 small">{formatDate(a.date)}</p>
                               {/* Run name — truncated, only show if different from cluster label */}
                               {a.name.replace(/^Nike Run Club:\s*/i, '').trim() !== c.label && (
-                                <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{a.name}</p>
+                                <p className="text-muted mb-0 text-truncate" style={{ fontSize: '0.72rem' }}>{a.name}</p>
                               )}
                             </div>
 
                             {/* Stats */}
-                            <div className="flex items-center gap-4 sm:gap-6 shrink-0 text-right">
+                            <div className="d-flex align-items-center gap-3 gap-sm-4 flex-shrink-0 text-end">
                               <div>
-                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                <p className="fw-semibold small text-body mb-0">
                                   {formatDistance(a.distance)}
                                 </p>
                               </div>
-                              <div className="w-16 hidden sm:block">
-                                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                              <div className="d-none d-sm-block" style={{ width: '4rem' }}>
+                                <p className="fw-semibold small text-body mb-0">
                                   {a.avgPace ? formatPace(a.avgPace) : '—'}
                                 </p>
                                 {a.avgPace && (
-                                  <p className="text-[10px] text-gray-400">/km</p>
+                                  <p className="text-muted mb-0" style={{ fontSize: '0.65rem' }}>/km</p>
                                 )}
                               </div>
-                              <div className="w-16 hidden sm:block">
-                                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                              <div className="d-none d-sm-block" style={{ width: '4rem' }}>
+                                <p className="fw-semibold small text-body mb-0">
                                   {a.duration ? formatDuration(a.duration) : '—'}
                                 </p>
                               </div>
-                              {/* Heart rate — mobile only shows if present */}
+                              {/* Heart rate — show if present */}
                               {a.avgHeartRate && (
-                                <div className="shrink-0">
-                                  <p className="text-sm font-semibold text-red-500">{Math.round(a.avgHeartRate)}</p>
-                                  <p className="text-[10px] text-gray-400">bpm</p>
+                                <div className="flex-shrink-0">
+                                  <p className="fw-semibold small text-danger mb-0">{Math.round(a.avgHeartRate)}</p>
+                                  <p className="text-muted mb-0" style={{ fontSize: '0.65rem' }}>bpm</p>
                                 </div>
                               )}
                               {/* Arrow */}
-                              <span className="text-gray-300 dark:text-gray-600 text-sm group-hover:text-gray-500 transition-colors">›</span>
+                              <span className="text-muted">&rsaquo;</span>
                             </div>
                           </Link>
                         )

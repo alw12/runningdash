@@ -47,9 +47,10 @@ export function GpxUpload({ onImport }: GpxUploadProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div>
       <div
-        className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+        className="border border-2 border-secondary rounded-3 p-5 text-center"
+        style={{ cursor: 'pointer', borderStyle: 'dashed' }}
         onClick={() => !loading && inputRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
@@ -62,31 +63,25 @@ export function GpxUpload({ onImport }: GpxUploadProps) {
           type="file"
           accept=".gpx"
           multiple
-          className="hidden"
+          className="d-none"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <div className="text-3xl mb-2">📂</div>
+        <div className="fs-1 mb-2">📂</div>
         {loading ? (
-          <p className="text-blue-600 font-medium">Importazione in corso…</p>
+          <p className="text-primary fw-semibold">Importazione in corso…</p>
         ) : (
           <>
-            <p className="text-gray-600 font-medium">Trascina file GPX qui</p>
-            <p className="text-gray-400 text-sm mt-1">
-              Anche file con più corse — clicca per selezionare
-            </p>
+            <p className="fw-semibold text-secondary mb-1">Trascina file GPX qui</p>
+            <small className="text-muted">Anche file con più corse — clicca per selezionare</small>
           </>
         )}
       </div>
 
       {(status?.count ?? 0) > 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
-          ✓ Importate {status?.count} corse
-        </div>
+        <div className="alert alert-success mt-2 py-2">✓ Importate {status?.count} corse</div>
       )}
       {status?.error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
-          {status.error}
-        </div>
+        <div className="alert alert-danger mt-2 py-2">{status.error}</div>
       )}
     </div>
   )

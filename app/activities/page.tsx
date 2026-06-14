@@ -5,9 +5,25 @@ import { Activity } from '@/types'
 import { getActivities, deleteActivities } from '@/lib/storage'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
 import { getZoneLabel, isWalkZone } from '@/lib/zone-utils'
-import { LABEL_STYLES } from '@/lib/labels'
 
 type SortKey = 'date' | 'distance' | 'pace' | 'hr'
+
+// Hex colors for activity labels (matches LABEL_STYLES keys in labels.ts)
+const LABEL_HEX: Record<string, string> = {
+  'Gara':        '#ef4444',
+  'Fondo lento': '#22c55e',
+  'Interval':    '#a855f7',
+  'Recupero':    '#6b7280',
+  'Long run':    '#f97316',
+}
+
+function badgeStyle(hexColor: string): React.CSSProperties {
+  return {
+    backgroundColor: hexColor + '22',
+    color: hexColor,
+    border: `1px solid ${hexColor}44`,
+  }
+}
 
 export default function ActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([])
@@ -67,29 +83,29 @@ export default function ActivitiesPage() {
   ]
 
   return (
-    <div className="space-y-5">
+    <div className="d-flex flex-column gap-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="d-flex justify-content-between align-items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Allenamenti</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{activities.length} corse totali</p>
+          <h1 className="h4 fw-bold mb-0">Allenamenti</h1>
+          <p className="text-muted small mb-0">{activities.length} corse totali</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="d-flex align-items-center gap-2">
           {selected.size > 0 && (
             confirmBulk ? (
               <>
-                <span className="text-sm text-gray-600">Eliminare {selected.size} corse?</span>
-                <button onClick={bulkDelete} className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors">
+                <span className="small text-muted">Eliminare {selected.size} corse?</span>
+                <button onClick={bulkDelete} className="btn btn-sm btn-danger">
                   Conferma
                 </button>
-                <button onClick={() => setConfirmBulk(false)} className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5">
+                <button onClick={() => setConfirmBulk(false)} className="btn btn-sm btn-outline-secondary">
                   Annulla
                 </button>
               </>
             ) : (
               <button
                 onClick={() => setConfirmBulk(true)}
-                className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium px-3 py-1.5 rounded-lg border border-red-200 transition-colors"
+                className="btn btn-sm btn-outline-danger"
               >
                 🗑 Elimina {selected.size} selezionate
               </button>
@@ -99,26 +115,29 @@ export default function ActivitiesPage() {
       </div>
 
       {/* Type filter */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
-        {([['all','Tutti'], ['run','Corse'], ['walk','Passeggiate']] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setTypeFilter(k)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === k ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-            {l}
-          </button>
-        ))}
+      <div className="d-flex flex-wrap gap-2">
+        <div className="btn-group" role="group" aria-label="Filtro tipo attività">
+          {([['all', 'Tutti'], ['run', 'Corse'], ['walk', 'Passeggiate']] as const).map(([k, l]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setTypeFilter(k)}
+              className={`btn btn-sm ${typeFilter === k ? 'btn-dark' : 'btn-outline-secondary'}`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Ordina:</span>
+      {/* Sort buttons */}
+      <div className="d-flex align-items-center gap-2 flex-wrap">
+        <span className="text-uppercase text-muted small fw-medium" style={{ letterSpacing: '0.05em' }}>Ordina:</span>
         {SORTS.map((s) => (
           <button
             key={s.key}
             onClick={() => setSort(s.key)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              sort === s.key
-                ? 'bg-gray-900 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-            }`}
+            className={`btn btn-sm ${sort === s.key ? 'btn-dark' : 'btn-outline-secondary'}`}
           >
             {s.label}
           </button>
@@ -126,85 +145,93 @@ export default function ActivitiesPage() {
       </div>
 
       {activities.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-gray-200">
-          <p className="text-4xl mb-3">🏃</p>
-          <p className="text-gray-500 text-sm">
-            Nessun allenamento.{' '}
-            <Link href="/" className="text-orange-500 hover:underline">Importa dati →</Link>
-          </p>
+        <div className="card text-center py-5">
+          <div className="card-body">
+            <p className="fs-1 mb-2">🏃</p>
+            <p className="text-muted small mb-0">
+              Nessun allenamento.{' '}
+              <Link href="/" className="text-warning text-decoration-none">Importa dati →</Link>
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
-                <th className="px-4 py-3 text-left w-8">
+        <div className="table-responsive">
+          <table className="table table-hover table-sm align-middle mb-0">
+            <thead className="table-light">
+              <tr className="text-uppercase text-muted small" style={{ letterSpacing: '0.05em' }}>
+                <th className="ps-3" style={{ width: '2rem' }}>
                   <input
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
-                    className="rounded border-gray-300 accent-orange-500"
+                    className="form-check-input"
                   />
                 </th>
-                <th className="text-left px-4 py-3">Nome</th>
-                <th className="text-left px-4 py-3">Data</th>
-                <th className="text-right px-4 py-3">Dist</th>
-                <th className="text-right px-4 py-3">Durata</th>
-                <th className="text-right px-4 py-3">Passo</th>
-                <th className="text-right px-4 py-3">FC med</th>
-                <th className="text-right px-4 py-3">FC max</th>
-                <th className="text-right px-4 py-3">↑ m</th>
-                <th className="text-left px-4 py-3">Scarpe</th>
+                <th>Nome</th>
+                <th>Data</th>
+                <th className="text-end">Dist</th>
+                <th className="text-end">Durata</th>
+                <th className="text-end">Passo</th>
+                <th className="text-end">FC med</th>
+                <th className="text-end">FC max</th>
+                <th className="text-end">↑ m</th>
+                <th>Scarpe</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {sorted.map((a) => {
                 const zone = getZoneLabel(a.avgPace)
                 return (
                   <tr
                     key={a.id}
-                    className={`transition-colors ${selected.has(a.id) ? 'bg-orange-50' : 'hover:bg-gray-50'}`}
+                    className={selected.has(a.id) ? 'table-warning' : ''}
                   >
-                    <td className="px-4 py-3">
+                    <td className="ps-3">
                       <input
                         type="checkbox"
                         checked={selected.has(a.id)}
                         onChange={() => toggle(a.id)}
-                        className="rounded border-gray-300 accent-orange-500"
+                        className="form-check-input"
                       />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Link href={`/activities/${a.id}`} className="font-medium text-gray-900 hover:text-orange-500 transition-colors">
+                    <td>
+                      <div className="d-flex align-items-center gap-2">
+                        <Link href={`/activities/${a.id}`} className="fw-medium text-dark text-decoration-none link-warning">
                           {a.name}
                         </Link>
-                        {a.label && LABEL_STYLES[a.label] ? (
-                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${LABEL_STYLES[a.label].bg} ${LABEL_STYLES[a.label].text}`}>
+                        {a.label && LABEL_HEX[a.label] ? (
+                          <span
+                            className="badge badge-label"
+                            style={badgeStyle(LABEL_HEX[a.label])}
+                          >
                             {a.label}
                           </span>
                         ) : (
-                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${zone.bg} ${zone.text}`}>
+                          <span
+                            className="badge badge-label"
+                            style={badgeStyle(zone.color)}
+                          >
                             {zone.label}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">{formatDate(a.date)}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{formatDistance(a.distance)}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{formatDuration(a.duration)}</td>
-                    <td className="px-4 py-3 text-right font-semibold" style={{ color: zone.color }}>
+                    <td className="text-muted">{formatDate(a.date)}</td>
+                    <td className="text-end fw-semibold">{formatDistance(a.distance)}</td>
+                    <td className="text-end text-muted">{formatDuration(a.duration)}</td>
+                    <td className="text-end fw-semibold" style={{ color: zone.color }}>
                       {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-red-500 font-semibold">
+                    <td className="text-end fw-semibold text-danger">
                       {a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-500">
+                    <td className="text-end text-muted">
                       {a.maxHeartRate ? Math.round(a.maxHeartRate) + ' bpm' : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-500">
+                    <td className="text-end text-muted">
                       {a.elevationGain > 0 ? '+' + Math.round(a.elevationGain) : '—'}
                     </td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{a.shoe ?? '—'}</td>
+                    <td className="text-muted small">{a.shoe ?? '—'}</td>
                   </tr>
                 )
               })}
