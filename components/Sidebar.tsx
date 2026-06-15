@@ -41,6 +41,7 @@ export function Sidebar({ onClose }: SidebarProps) {
               href={item.href}
               onClick={onClose}
               className={`nav-link d-flex align-items-center gap-2 mb-1 ${isActive ? 'active' : ''}`}
+              aria-current={isActive ? 'page' : undefined}
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>

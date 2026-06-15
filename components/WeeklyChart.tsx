@@ -48,7 +48,7 @@ export function WeeklyChart({ activities }: WeeklyChartProps) {
         <XAxis dataKey="week" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} unit=" km" />
         <Tooltip formatter={(v) => [String(v) + ' km', 'Distanza']} />
-        <Bar dataKey="km" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="km" fill="var(--rd-distance)" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

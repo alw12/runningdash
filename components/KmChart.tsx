@@ -48,9 +48,16 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload || payload.length === 0) return null
   const km = payload[0].value ?? 0
   return (
-    <div className="bg-white border rounded px-3 py-2 shadow-sm" style={{ fontSize: '0.875rem' }}>
-      <p className="fw-medium text-secondary mb-0">{String(label ?? '')}</p>
-      <p className="fw-semibold mb-0" style={{ color: '#f97316' }}>{km.toFixed(2)} km</p>
+    <div style={{
+      background: 'var(--rd-sidebar-bg)',
+      color: '#fff',
+      borderRadius: 'var(--rd-radius-md)',
+      padding: '8px 12px',
+      fontSize: 'var(--rd-font-size-sm)',
+      boxShadow: 'var(--rd-shadow-md)',
+    }}>
+      <p style={{ color: 'var(--rd-text-muted)', margin: '0 0 2px', fontSize: 'var(--rd-font-size-xs)' }}>{String(label ?? '')}</p>
+      <p style={{ color: 'var(--rd-brand)', fontWeight: 600, margin: 0 }}>{km.toFixed(2)} km</p>
     </div>
   )
 }
@@ -231,19 +238,19 @@ export function KmChart({ activities }: KmChartProps) {
         <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2 mb-3">
           <h2 className="h6 fw-semibold mb-0">Chilometri</h2>
 
-          {/* Tab selector */}
-          <ul className="nav nav-tabs border-0 mb-0">
+          {/* Tab selector — segmented pill control */}
+          <div className="rd-segmented" role="group" aria-label="Vista chilometri">
             {TAB_LABELS.map(({ key, label }) => (
-              <li className="nav-item" key={key}>
-                <button
-                  className={`nav-link${vista === key ? ' active' : ''}`}
-                  onClick={() => handleSetVista(key)}
-                >
-                  {label}
-                </button>
-              </li>
+              <button
+                key={key}
+                className={`rd-segmented-btn${vista === key ? ' active' : ''}`}
+                onClick={() => handleSetVista(key)}
+                aria-pressed={vista === key}
+              >
+                {label}
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
 
         {/* Selettore mese/anno (solo vista giornaliera) */}
@@ -290,7 +297,7 @@ export function KmChart({ activities }: KmChartProps) {
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
                     {data.map((_, i) => (
-                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                      <Cell key={`cell-${i}`} fill="var(--rd-distance)" fillOpacity={selectedIdx === null || i === selectedIdx ? 1 : 0.45} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -310,7 +317,7 @@ export function KmChart({ activities }: KmChartProps) {
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
                     {data.map((_, i) => (
-                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                      <Cell key={`cell-${i}`} fill="var(--rd-distance)" fillOpacity={selectedIdx === null || i === selectedIdx ? 1 : 0.45} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -330,7 +337,7 @@ export function KmChart({ activities }: KmChartProps) {
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
                     {data.map((_, i) => (
-                      <Cell key={`cell-${i}`} fill={i === selectedIdx ? '#ea580c' : '#f97316'} />
+                      <Cell key={`cell-${i}`} fill="var(--rd-distance)" fillOpacity={selectedIdx === null || i === selectedIdx ? 1 : 0.45} />
                     ))}
                   </Bar>
                 </BarChart>

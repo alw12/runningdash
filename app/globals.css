@@ -1,27 +1,124 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 :root {
-  --bs-orange: #f97316;
-  --brand: #f97316;
-  --brand-dark: #ea580c;
+  /* Brand */
+  --brand:             #f97316;
+  --brand-dark:        #ea580c;
+  --bs-orange:         #f97316;
+
+  /* Design tokens */
+  --rd-brand:          #f97316;
+  --rd-brand-dark:     #ea580c;
+  --rd-brand-muted:    #fff7ed;
+  --rd-brand-border:   #fed7aa;
+
+  /* Semantic data colors */
+  --rd-pace:           #3b82f6;
+  --rd-hr:             #ef4444;
+  --rd-elevation:      #22c55e;
+  --rd-distance:       #f97316;
+
+  /* Surfaces */
+  --rd-sidebar-bg:     #111827;
+  --rd-sidebar-hover:  #1f2937;
+  --rd-sidebar-border: #374151;
+  --rd-page-bg:        #f9fafb;
+  --rd-card-bg:        #ffffff;
+  --rd-card-border:    #e5e7eb;
+
+  /* Text */
+  --rd-text-primary:   #111827;
+  --rd-text-secondary: #6b7280;
+  --rd-text-muted:     #9ca3af;
+  --rd-text-label:     #374151;
+
+  /* Status */
+  --rd-success:        #16a34a;
+  --rd-warning:        #d97706;
+  --rd-danger:         #dc2626;
+
+  /* Elevation */
+  --rd-shadow-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --rd-shadow-md:      0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  --rd-shadow-card:    0 1px 4px rgba(0,0,0,0.06);
+
+  /* Spacing */
+  --rd-space-xs:       0.25rem;
+  --rd-space-sm:       0.5rem;
+  --rd-space-md:       1rem;
+  --rd-space-lg:       1.5rem;
+  --rd-space-xl:       2rem;
+
+  /* Radii */
+  --rd-radius-sm:      6px;
+  --rd-radius-md:      10px;
+  --rd-radius-lg:      14px;
+  --rd-radius-pill:    9999px;
+
+  /* Typography */
+  --rd-font-size-xs:   0.6875rem;
+  --rd-font-size-sm:   0.75rem;
+  --rd-font-size-base: 0.875rem;
+  --rd-font-size-lg:   1rem;
+  --rd-font-size-xl:   1.25rem;
+  --rd-font-size-stat: 1.5rem;
+
+  /* Stat tints */
+  --rd-tint-orange:    #fff7ed;
+  --rd-tint-green:     #f0fdf4;
+  --rd-tint-red:       #fff1f2;
+  --rd-tint-blue:      #eff6ff;
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-.btn-brand { background: var(--brand); color: #fff; border: none; }
-.btn-brand:hover { background: var(--brand-dark); color: #fff; }
-.text-brand { color: var(--brand) !important; }
-.bg-brand { background: var(--brand) !important; }
-.border-brand { border-color: var(--brand) !important; }
+
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: var(--rd-font-size-base); }
+
+/* Shimmer skeleton */
+@keyframes rd-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Brand utils */
+.btn-brand { background: var(--rd-brand); color: #fff; border: none; }
+.btn-brand:hover { background: var(--rd-brand-dark); color: #fff; }
+.text-brand { color: var(--rd-brand) !important; }
+.bg-brand { background: var(--rd-brand) !important; }
+.border-brand { border-color: var(--rd-brand) !important; }
 .badge-label { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; }
-.progress-bar-brand { background: var(--brand); }
+.progress-bar-brand { background: var(--rd-brand); }
+
 /* Sidebar desktop */
-.sidebar { width: 220px; min-height: 100vh; background: #111827; flex-shrink: 0; }
-.sidebar .nav-link { color: #9ca3af; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; font-weight: 500; }
-.sidebar .nav-link:hover { color: #fff; background: #1f2937; }
-.sidebar .nav-link.active { background: var(--brand); color: #fff; }
+.sidebar { width: 220px; min-height: 100vh; background: var(--rd-sidebar-bg); flex-shrink: 0; }
+.sidebar .nav-link { color: var(--rd-text-muted); border-radius: var(--rd-radius-sm); padding: 10px 12px; font-size: var(--rd-font-size-base); font-weight: 500; }
+.sidebar .nav-link:hover { color: #fff; background: var(--rd-sidebar-hover); }
+.sidebar .nav-link.active { background: var(--rd-brand); color: #fff; }
+
 /* Mobile top bar */
-.mobile-topbar { background: #111827; }
+.mobile-topbar { background: var(--rd-sidebar-bg); }
+
 /* Offcanvas mobile nav */
-.offcanvas-nav { width: 240px !important; background: #111827; }
-.offcanvas-nav .nav-link { color: #9ca3af; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; font-weight: 500; }
-.offcanvas-nav .nav-link:hover { color: #fff; background: #1f2937; }
-.offcanvas-nav .nav-link.active { background: var(--brand); color: #fff; }
+.offcanvas-nav { width: 240px !important; background: var(--rd-sidebar-bg); }
+.offcanvas-nav .nav-link { color: var(--rd-text-muted); border-radius: var(--rd-radius-sm); padding: 10px 12px; font-size: var(--rd-font-size-base); font-weight: 500; }
+.offcanvas-nav .nav-link:hover { color: #fff; background: var(--rd-sidebar-hover); }
+.offcanvas-nav .nav-link.active { background: var(--rd-brand); color: #fff; }
+
+/* KmChart segmented control */
+.rd-segmented { display: flex; background: var(--rd-card-border); border-radius: var(--rd-radius-pill); padding: 3px; gap: 2px; }
+.rd-segmented-btn {
+  border: none;
+  border-radius: var(--rd-radius-pill);
+  padding: 4px 14px;
+  font-size: var(--rd-font-size-xs);
+  font-weight: 500;
+  background: transparent;
+  color: var(--rd-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.rd-segmented-btn.active {
+  background: #fff;
+  color: var(--rd-text-primary);
+  font-weight: 600;
+  box-shadow: var(--rd-shadow-sm);
+}

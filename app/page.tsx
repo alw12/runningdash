@@ -7,6 +7,7 @@ import { getActivities, saveActivities, mergeActivities, getShoes } from '@/lib/
 import { autoSeedIfEmpty } from '@/lib/seed'
 
 import { KmChart } from '@/components/KmChart'
+import { StatCard } from '@/components/StatCard'
 import { GpxUpload } from '@/components/GpxUpload'
 import { StravaExportUpload } from '@/components/StravaExportUpload'
 import { formatPace, formatDistance, formatDuration, formatDate } from '@/lib/utils'
@@ -34,31 +35,6 @@ function ActivityTypeIcon({ type }: { type: string }) {
   return <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>{isWalkOrHike ? '🚶' : '🏃'}</span>
 }
 
-function TrendArrow({ thisWeek, lastWeek }: { thisWeek: number; lastWeek: number }) {
-  const diff = thisWeek - lastWeek
-  if (Math.abs(diff) < 0.05) {
-    return (
-      <span className="d-flex align-items-center gap-1 text-muted mt-1" style={{ fontSize: '0.75rem' }}>
-        <span>→</span>
-        <span>invariato vs sett. prec.</span>
-      </span>
-    )
-  }
-  if (diff > 0) {
-    return (
-      <span className="d-flex align-items-center gap-1 text-success mt-1" style={{ fontSize: '0.75rem' }}>
-        <span>↑</span>
-        <span>+{diff.toFixed(1)} km vs sett. prec.</span>
-      </span>
-    )
-  }
-  return (
-    <span className="d-flex align-items-center gap-1 text-danger mt-1" style={{ fontSize: '0.75rem' }}>
-      <span>↓</span>
-      <span>{diff.toFixed(1)} km vs sett. prec.</span>
-    </span>
-  )
-}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -219,96 +195,90 @@ export default function Dashboard() {
 
       {/* Stat cards */}
       <div className="row g-3 mb-4">
-        {/* Questa settimana — con trend */}
         <div className="col-6 col-md-3">
-          <div className="card h-100 border-0" style={{ background: '#fff7ed', borderColor: '#fed7aa' }}>
-            <div className="card-body">
-              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Questa settimana</p>
-              <p className="fs-5 fw-bold mb-0">{thisWeekKm.toFixed(1)} km</p>
-              <TrendArrow thisWeek={thisWeekKm} lastWeek={lastWeekKm} />
-            </div>
-          </div>
+          <StatCard
+            label="Questa settimana"
+            value={`${thisWeekKm.toFixed(1)} km`}
+            variant="orange"
+            trend={{ value: thisWeekKm - lastWeekKm, unit: 'km' }}
+          />
         </div>
-
         <div className="col-6 col-md-3">
-          <div className="card h-100 border-0" style={{ background: '#fff7ed', borderColor: '#fed7aa' }}>
-            <div className="card-body">
-              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Km totali</p>
-              <p className="fs-5 fw-bold mb-0">{totalKm.toFixed(0)} km</p>
-              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>{recent.length} corse</p>
-            </div>
-          </div>
+          <StatCard
+            label="Km totali"
+            value={`${totalKm.toFixed(0)} km`}
+            sub={`${recent.length} corse`}
+            variant="orange"
+          />
         </div>
-
         <div className="col-6 col-md-3">
-          <div className="card h-100 border-0" style={{ background: '#f0fdf4', borderColor: '#bbf7d0' }}>
-            <div className="card-body">
-              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>Passo medio</p>
-              <p className="fs-5 fw-bold mb-0">{avgPace > 0 ? formatPace(avgPace) + '/km' : '—'}</p>
-              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>ultime 30 corse</p>
-            </div>
-          </div>
+          <StatCard
+            label="Passo medio"
+            value={avgPace > 0 ? formatPace(avgPace) + '/km' : '—'}
+            valueA11y={avgPace > 0 ? `${formatPace(avgPace)} al chilometro` : 'non disponibile'}
+            sub="ultime 30 corse"
+            variant="green"
+          />
         </div>
-
         <div className="col-6 col-md-3">
-          <div className="card h-100 border-0" style={{ background: '#fff1f2', borderColor: '#fecdd3' }}>
-            <div className="card-body">
-              <p className="text-muted text-uppercase fw-medium mb-1" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>FC media</p>
-              <p className="fs-5 fw-bold mb-0">{avgHR > 0 ? Math.round(avgHR) + ' bpm' : '—'}</p>
-              <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>ultime 30 corse</p>
-            </div>
-          </div>
+          <StatCard
+            label="FC media"
+            value={avgHR > 0 ? `${Math.round(avgHR)} bpm` : '—'}
+            valueA11y={avgHR > 0 ? `${Math.round(avgHR)} battiti al minuto` : 'non disponibile'}
+            sub="ultime 30 corse"
+            variant="red"
+          />
         </div>
       </div>
 
-      {/* Km chart */}
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body">
+      {/* Km chart + Scarpe — side-by-side on xl */}
+      <div className="row g-3 mb-4">
+        <div className="col-12 col-xl-8">
           <KmChart activities={activities} />
         </div>
-      </div>
-
-      {/* Scarpe attive */}
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <h2 className="h6 fw-semibold mb-3">Scarpe</h2>
-          {activeShoeStats.length === 0 ? (
-            <p className="text-muted small text-center py-3 mb-0">Importa dati Strava per vedere le scarpe</p>
-          ) : (
-            <div className="d-flex flex-column gap-3">
-              {activeShoeStats.map(({ shoe, totalKm: totalKmShoe, maxKm, wearPct }) => {
-                const isWorn = wearPct > 80
-                const remainingKm = Math.max(maxKm - totalKmShoe, 0)
-                const barBg =
-                  wearPct > 80 ? '#dc3545' : wearPct > 60 ? '#ffc107' : '#198754'
-                return (
-                  <div key={shoe.id}>
-                    <div className="d-flex align-items-center justify-content-between mb-1">
-                      <span
-                        className={`small text-truncate ${isWorn ? 'text-danger fw-semibold' : 'fw-medium'}`}
-                        title={[shoe.brand, shoe.model, shoe.displayName].filter(Boolean).join(' ')}
-                      >
-                        {isWorn && <span className="me-1">!</span>}{shoe.displayName}
-                      </span>
-                      <span className="text-muted ms-2 text-nowrap" style={{ fontSize: '0.72rem', flexShrink: 0 }}>
-                        {Math.round(totalKmShoe)} km · {Math.round(remainingKm)} rimasti
-                      </span>
-                    </div>
-                    <div className="progress" style={{ height: '8px' }}>
-                      <div
-                        className="progress-bar"
-                        role="progressbar"
-                        style={{ width: `${wearPct}%`, background: barBg }}
-                        aria-valuenow={wearPct}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
+        <div className="col-12 col-xl-4">
+          <div className="card border-0 shadow-sm h-100">
+            <div className="card-body">
+              <h2 className="h6 fw-semibold mb-3">Scarpe</h2>
+              {activeShoeStats.length === 0 ? (
+                <p className="text-muted small text-center py-3 mb-0">Importa dati Strava per vedere le scarpe</p>
+              ) : (
+                <div className="d-flex flex-column gap-3">
+                  {activeShoeStats.map(({ shoe, totalKm: totalKmShoe, maxKm, wearPct }) => {
+                    const isWorn = wearPct > 80
+                    const remainingKm = Math.max(maxKm - totalKmShoe, 0)
+                    const barBg =
+                      wearPct > 80 ? '#dc3545' : wearPct > 60 ? '#ffc107' : '#198754'
+                    return (
+                      <div key={shoe.id}>
+                        <div className="d-flex align-items-center justify-content-between mb-1">
+                          <span
+                            className={`small text-truncate ${isWorn ? 'text-danger fw-semibold' : 'fw-medium'}`}
+                            title={[shoe.brand, shoe.model, shoe.displayName].filter(Boolean).join(' ')}
+                          >
+                            {isWorn && <span className="me-1">!</span>}{shoe.displayName}
+                          </span>
+                          <span className="text-muted ms-2 text-nowrap" style={{ fontSize: '0.72rem', flexShrink: 0 }}>
+                            {Math.round(totalKmShoe)} km · {Math.round(remainingKm)} rimasti
+                          </span>
+                        </div>
+                        <div className="progress" style={{ height: '8px' }}>
+                          <div
+                            className="progress-bar"
+                            role="progressbar"
+                            style={{ width: `${wearPct}%`, background: barBg }}
+                            aria-valuenow={wearPct}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

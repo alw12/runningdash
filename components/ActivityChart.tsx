@@ -33,13 +33,23 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-gray-900 text-white rounded-xl px-3 py-2.5 text-xs shadow-xl border border-gray-700">
-      <p className="text-gray-400 mb-1.5 font-medium">{((label ?? 0) / 1000).toFixed(2)} km</p>
+    <div style={{
+      background: 'var(--rd-sidebar-bg)',
+      color: '#fff',
+      borderRadius: 'var(--rd-radius-md)',
+      padding: '8px 12px',
+      fontSize: 'var(--rd-font-size-sm)',
+      boxShadow: 'var(--rd-shadow-md)',
+      border: '1px solid var(--rd-sidebar-border)',
+    }}>
+      <p style={{ color: 'var(--rd-text-muted)', margin: '0 0 6px', fontWeight: 500 }}>
+        {((label ?? 0) / 1000).toFixed(2)} km
+      </p>
       {payload.map((p) => (
-        <div key={p.name} className="flex items-center gap-2 mb-0.5">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.color }} />
-          <span className="text-gray-300">{p.name}:</span>
-          <span className="font-bold">
+        <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color, flexShrink: 0, display: 'inline-block' }} />
+          <span style={{ color: '#d1d5db' }}>{p.name}:</span>
+          <span style={{ fontWeight: 700 }}>
             {p.name === 'Passo' ? formatPace(p.value) + '/km'
              : p.name === 'FC' ? Math.round(p.value) + ' bpm'
              : Math.round(p.value) + ' m'}
