@@ -1,12 +1,12 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* ============================================================
-   RunDash Design System — Dark Slate + Signal Green
-   Inspired by WHOOP / Linear / Garmin Connect dark mode.
+   RunDash Design System — Navy + Coral
+   Inspired by Strava / athletic performance dashboards.
 
    Key principles:
    - Three-level surface hierarchy with visible contrast steps
-   - Single vivid accent (signal green) — not applied to data
+   - Single coral accent — energetic, athletic, recognizable
    - Data colors are desaturated enough to coexist without clash
    - Sidebar (not rail) on desktop: 200px with icon + label
    - Bottom tab bar on mobile, topbar removed on desktop
@@ -14,50 +14,50 @@
 
 :root {
   /* ── Brand ─────────────────────────────────────────────── */
-  --rd-brand:           #00e5a0;   /* signal green — primary accent */
-  --rd-brand-dark:      #00c488;   /* pressed / hover state         */
-  --rd-brand-muted:     #00251a;   /* tinted background behind brand elements */
-  --rd-brand-border:    #005540;   /* border on brand-tinted surfaces */
+  --rd-brand:           #fc4c02;   /* coral orange — primary accent  */
+  --rd-brand-dark:      #e04100;   /* pressed / hover state          */
+  --rd-brand-muted:     #2a1508;   /* tinted background behind brand elements */
+  --rd-brand-border:    #6b2200;   /* border on brand-tinted surfaces */
 
   /* ── Semantic data colors ────────────────────────────────── */
   /* Desaturated enough to coexist; each has a distinct hue.   */
-  --rd-pace:            #7c9fff;   /* periwinkle — pace/speed   */
-  --rd-hr:              #f47070;   /* soft red — heart rate     */
-  --rd-elevation:       #62e09a;   /* mid-green — elevation     */
-  --rd-distance:        #00e5a0;   /* = brand — distance/km     */
+  --rd-pace:            #7eb8f7;   /* sky blue — pace/speed     */
+  --rd-hr:              #f97070;   /* soft red — heart rate     */
+  --rd-elevation:       #5dd6a0;   /* teal-green — elevation    */
+  --rd-distance:        #fc4c02;   /* = brand — distance/km     */
 
   /* ── Surfaces — three perceivable dark steps ──────────────── */
   /* Lightness delta between each step: ~6-8 L* units in OKLCH  */
-  --rd-page-bg:         #111318;   /* base canvas              */
-  --rd-surface:         #191c23;   /* card background          */
-  --rd-raised:          #21252e;   /* hover state / input bg   */
-  --rd-card-bg:         #191c23;
-  --rd-card-border:     #2d3340;   /* border between surfaces  */
-  --rd-card-border-subtle: #232838; /* lighter separator inside cards */
+  --rd-page-bg:         #12162a;   /* deep navy canvas          */
+  --rd-surface:         #1a1f35;   /* card background           */
+  --rd-raised:          #222840;   /* hover state / input bg    */
+  --rd-card-bg:         #1a1f35;
+  --rd-card-border:     #2e3556;   /* border between surfaces   */
+  --rd-card-border-subtle: #242a47; /* lighter separator inside cards */
 
   /* ── Sidebar ─────────────────────────────────────────────── */
-  --rd-sidebar-bg:      #13161e;   /* slightly deeper than page-bg */
-  --rd-sidebar-hover:   #1e222c;
-  --rd-sidebar-active:  rgba(0, 229, 160, 0.10);
-  --rd-sidebar-border:  #2a2f3d;
+  --rd-sidebar-bg:      #101424;   /* slightly deeper than page-bg */
+  --rd-sidebar-hover:   #1e2440;
+  --rd-sidebar-active:  rgba(252, 76, 2, 0.12);
+  --rd-sidebar-border:  #272d4e;
   --rd-sidebar-width:   200px;     /* wider — shows icon + label   */
 
   /* ── Topbar (mobile only in the new layout) ─────────────── */
-  --rd-topbar-bg:       #13161e;
-  --rd-topbar-border:   #2a2f3d;
+  --rd-topbar-bg:       #101424;
+  --rd-topbar-border:   #272d4e;
   --rd-topbar-height:   52px;
 
   /* ── Bottom tab bar (mobile) ────────────────────────────── */
-  --rd-tabbar-bg:       #13161e;
-  --rd-tabbar-border:   #2a2f3d;
+  --rd-tabbar-bg:       #101424;
+  --rd-tabbar-border:   #272d4e;
   --rd-tabbar-height:   58px;
 
   /* ── Text — four levels ──────────────────────────────────── */
-  --rd-text-primary:    #e8eaf2;   /* ~92% white — body text       */
-  --rd-text-secondary:  #7a8099;   /* labels, meta, secondary info */
-  --rd-text-muted:      #484f66;   /* placeholders, disabled       */
-  --rd-text-label:      #7a8099;   /* alias for section labels     */
-  --rd-text-on-brand:   #0a1a14;   /* dark text on brand bg        */
+  --rd-text-primary:    #e9ebf5;   /* ~93% white — body text       */
+  --rd-text-secondary:  #7e8aac;   /* labels, meta, secondary info */
+  --rd-text-muted:      #4a5272;   /* placeholders, disabled       */
+  --rd-text-label:      #7e8aac;   /* alias for section labels     */
+  --rd-text-on-brand:   #ffffff;   /* white text on coral bg       */
 
   /* ── Status ─────────────────────────────────────────────── */
   --rd-success:         #4ade80;
@@ -65,9 +65,9 @@
   --rd-danger:          #f87171;
 
   /* ── Elevation / shadows ──────────────────────────────────  */
-  --rd-shadow-sm:       0 1px 3px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.3);
-  --rd-shadow-md:       0 4px 16px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35);
-  --rd-shadow-card:     0 1px 4px rgba(0,0,0,0.4);
+  --rd-shadow-sm:       0 1px 3px rgba(0,0,10,0.5), 0 1px 2px rgba(0,0,10,0.35);
+  --rd-shadow-md:       0 4px 16px rgba(0,0,10,0.6), 0 2px 6px rgba(0,0,10,0.4);
+  --rd-shadow-card:     0 1px 4px rgba(0,0,10,0.45);
 
   /* ── Spacing ─────────────────────────────────────────────── */
   --rd-space-xs:        0.25rem;
@@ -99,10 +99,10 @@
   --rd-stat-accent-elev:  var(--rd-elevation);
 
   /* ── Tints (8% opacity fills for subtle backgrounds) ─────── */
-  --rd-tint-brand:    rgba(0, 229, 160, 0.08);
-  --rd-tint-pace:     rgba(124, 159, 255, 0.08);
-  --rd-tint-hr:       rgba(244, 112, 112, 0.08);
-  --rd-tint-elev:     rgba(98, 224, 154,  0.08);
+  --rd-tint-brand:    rgba(252, 76,  2,   0.10);
+  --rd-tint-pace:     rgba(126, 184, 247, 0.08);
+  --rd-tint-hr:       rgba(249, 112, 112, 0.08);
+  --rd-tint-elev:     rgba(93,  214, 160, 0.08);
 
   /* ── Legacy aliases (kept so old code doesn't break) ─────── */
   --rd-rail-width:      var(--rd-sidebar-width);
@@ -113,6 +113,7 @@
 
   /* ── Bootstrap overrides ─────────────────────────────────── */
   --bs-orange:          var(--rd-brand);
+  --bs-primary:         var(--rd-brand);
 }
 
 /* ============================================================
@@ -176,7 +177,7 @@ body {
   background-color: var(--rd-raised);
   border-color: var(--rd-brand);
   color: var(--rd-text-primary);
-  box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.16);
+  box-shadow: 0 0 0 3px rgba(252, 76, 2, 0.20);
 }
 
 .form-control::placeholder {
@@ -226,7 +227,7 @@ body {
 .btn-brand:focus-visible {
   background: var(--rd-brand-dark);
   color: var(--rd-text-on-brand);
-  box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.24);
+  box-shadow: 0 0 0 3px rgba(252, 76, 2, 0.28);
 }
 
 .text-brand   { color: var(--rd-brand)      !important; }
@@ -256,7 +257,7 @@ body {
   background: linear-gradient(
     90deg,
     var(--rd-raised)  25%,
-    #2a3044           50%,
+    #2d3558           50%,
     var(--rd-raised)  75%
   );
   background-size: 200% 100%;
@@ -776,7 +777,7 @@ body {
 
 .rd-segmented-btn:hover:not(.active) {
   color: var(--rd-text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 /* ============================================================

@@ -18,15 +18,13 @@ export interface StatCardProps {
   valueA11y?: string
 }
 
-// On the dark theme, instead of tinted backgrounds (too subtle) we use:
-// - a card with var(--rd-card-bg) surface
-// - a 3px left border in the variant color for immediate visual scanning
-// - the value number rendered in the variant color
+// Navy + coral theme: card bg surface, 3px left border in variant color,
+// value number rendered in the variant color for immediate visual scanning.
 const VARIANT_MAP: Record<StatCardVariant, { borderColor: string; valueColor: string }> = {
-  orange:  { borderColor: 'var(--rd-brand)',     valueColor: 'var(--rd-brand)'     },
-  green:   { borderColor: 'var(--rd-elevation)', valueColor: 'var(--rd-elevation)' },
-  red:     { borderColor: 'var(--rd-hr)',         valueColor: 'var(--rd-hr)'        },
-  blue:    { borderColor: 'var(--rd-pace)',        valueColor: 'var(--rd-pace)'      },
+  orange:  { borderColor: 'var(--rd-brand)',      valueColor: 'var(--rd-brand)'      },
+  green:   { borderColor: 'var(--rd-elevation)',  valueColor: 'var(--rd-elevation)'  },
+  red:     { borderColor: 'var(--rd-hr)',          valueColor: 'var(--rd-hr)'         },
+  blue:    { borderColor: 'var(--rd-pace)',         valueColor: 'var(--rd-pace)'       },
   neutral: { borderColor: 'var(--rd-card-border)', valueColor: 'var(--rd-text-primary)' },
 }
 
