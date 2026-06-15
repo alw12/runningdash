@@ -1,109 +1,601 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* ============================================================
+   RunDash Design System — Dark Theme
+   Palette: Dark base + Acid Lime accent (WHOOP / Garmin style)
+   ============================================================ */
+
 :root {
-  /* Brand */
-  --brand:             #f97316;
-  --brand-dark:        #ea580c;
-  --bs-orange:         #f97316;
+  /* ── Brand ─────────────────────────────────────────────── */
+  --brand:              #a3e635;
+  --brand-dark:         #84cc16;
+  --bs-orange:          #a3e635;
 
-  /* Design tokens */
-  --rd-brand:          #f97316;
-  --rd-brand-dark:     #ea580c;
-  --rd-brand-muted:    #fff7ed;
-  --rd-brand-border:   #fed7aa;
+  /* ── Core design tokens ─────────────────────────────────── */
+  --rd-brand:           #a3e635;
+  --rd-brand-dark:      #84cc16;
+  --rd-brand-muted:     #1a2a06;
+  --rd-brand-border:    #3a5a0a;
 
-  /* Semantic data colors */
-  --rd-pace:           #3b82f6;
-  --rd-hr:             #ef4444;
-  --rd-elevation:      #22c55e;
-  --rd-distance:       #f97316;
+  /* ── Semantic data colors ────────────────────────────────── */
+  /* Each metric has a distinct hue so charts/cards are scannable */
+  --rd-pace:            #60a5fa;   /* blue-400  */
+  --rd-hr:              #f87171;   /* red-400   */
+  --rd-elevation:       #34d399;   /* emerald-400 */
+  --rd-distance:        #a3e635;   /* lime = brand */
 
-  /* Surfaces */
-  --rd-sidebar-bg:     #111827;
-  --rd-sidebar-hover:  #1f2937;
-  --rd-sidebar-border: #374151;
-  --rd-page-bg:        #f9fafb;
-  --rd-card-bg:        #ffffff;
-  --rd-card-border:    #e5e7eb;
+  /* ── Surfaces (dark hierarchy: base → surface → raised) ─── */
+  --rd-page-bg:         #0a0a0f;
+  --rd-surface:         #12121a;
+  --rd-raised:          #1a1a26;
+  --rd-card-bg:         #12121a;
+  --rd-card-border:     #2a2a3a;
 
-  /* Text */
-  --rd-text-primary:   #111827;
-  --rd-text-secondary: #6b7280;
-  --rd-text-muted:     #9ca3af;
-  --rd-text-label:     #374151;
+  /* ── Sidebar / rail ─────────────────────────────────────── */
+  --rd-sidebar-bg:      #0d0d15;
+  --rd-sidebar-hover:   #1a1a26;
+  --rd-sidebar-border:  #2a2a3a;
+  --rd-rail-width:      64px;
 
-  /* Status */
-  --rd-success:        #16a34a;
-  --rd-warning:        #d97706;
-  --rd-danger:         #dc2626;
+  /* ── Topbar ─────────────────────────────────────────────── */
+  --rd-topbar-bg:       #0d0d15;
+  --rd-topbar-border:   #2a2a3a;
+  --rd-topbar-height:   48px;
 
-  /* Elevation */
-  --rd-shadow-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --rd-shadow-md:      0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
-  --rd-shadow-card:    0 1px 4px rgba(0,0,0,0.06);
+  /* ── Bottom tab bar (mobile) ────────────────────────────── */
+  --rd-tabbar-bg:       #0d0d15;
+  --rd-tabbar-border:   #2a2a3a;
+  --rd-tabbar-height:   56px;
 
-  /* Spacing */
-  --rd-space-xs:       0.25rem;
-  --rd-space-sm:       0.5rem;
-  --rd-space-md:       1rem;
-  --rd-space-lg:       1.5rem;
-  --rd-space-xl:       2rem;
+  /* ── Text ───────────────────────────────────────────────── */
+  --rd-text-primary:    #f0f0f5;
+  --rd-text-secondary:  #8888a8;
+  --rd-text-muted:      #55556a;
+  --rd-text-label:      #8888a8;
 
-  /* Radii */
-  --rd-radius-sm:      6px;
-  --rd-radius-md:      10px;
-  --rd-radius-lg:      14px;
-  --rd-radius-pill:    9999px;
+  /* ── Status ─────────────────────────────────────────────── */
+  --rd-success:         #4ade80;   /* green-400  */
+  --rd-warning:         #fbbf24;   /* amber-400  */
+  --rd-danger:          #f87171;   /* red-400    */
 
-  /* Typography */
-  --rd-font-size-xs:   0.6875rem;
-  --rd-font-size-sm:   0.75rem;
-  --rd-font-size-base: 0.875rem;
-  --rd-font-size-lg:   1rem;
-  --rd-font-size-xl:   1.25rem;
-  --rd-font-size-stat: 1.5rem;
+  /* ── Elevation / shadows ─────────────────────────────────── */
+  /* On dark surfaces, shadows are subtler — rely on borders instead */
+  --rd-shadow-sm:       0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --rd-shadow-md:       0 4px 12px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
+  --rd-shadow-card:     0 1px 3px rgba(0,0,0,0.35);
 
-  /* Stat tints */
-  --rd-tint-orange:    #fff7ed;
-  --rd-tint-green:     #f0fdf4;
-  --rd-tint-red:       #fff1f2;
-  --rd-tint-blue:      #eff6ff;
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --rd-space-xs:        0.25rem;
+  --rd-space-sm:        0.5rem;
+  --rd-space-md:        1rem;
+  --rd-space-lg:        1.5rem;
+  --rd-space-xl:        2rem;
+
+  /* ── Radii ───────────────────────────────────────────────── */
+  --rd-radius-sm:       6px;
+  --rd-radius-md:       10px;
+  --rd-radius-lg:       14px;
+  --rd-radius-pill:     9999px;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --rd-font-size-xs:    0.6875rem;
+  --rd-font-size-sm:    0.75rem;
+  --rd-font-size-base:  0.875rem;
+  --rd-font-size-lg:    1rem;
+  --rd-font-size-xl:    1.25rem;
+  --rd-font-size-stat:  1.625rem;
+
+  /* ── Stat card tints (dark-adapted: very low-opacity fills) ─ */
+  --rd-tint-orange:     rgba(163, 230, 53,  0.08);
+  --rd-tint-green:      rgba(52,  211, 153, 0.08);
+  --rd-tint-red:        rgba(248, 113, 113, 0.08);
+  --rd-tint-blue:       rgba(96,  165, 250, 0.08);
 }
 
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: var(--rd-font-size-base); }
+/* ============================================================
+   Base overrides — push Bootstrap's light defaults to dark
+   ============================================================ */
 
-/* Shimmer skeleton */
+html,
+body {
+  background-color: var(--rd-page-bg);
+  color: var(--rd-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  font-size: var(--rd-font-size-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bootstrap's .card, .list-group-item, .card-header all default to white — override globally */
+.card {
+  background-color: var(--rd-card-bg) !important;
+  border-color: var(--rd-card-border) !important;
+  color: var(--rd-text-primary);
+}
+
+.card-header {
+  background-color: var(--rd-raised) !important;
+  border-bottom-color: var(--rd-card-border) !important;
+  color: var(--rd-text-primary);
+}
+
+.list-group-item {
+  background-color: var(--rd-card-bg) !important;
+  border-color: var(--rd-card-border) !important;
+  color: var(--rd-text-primary);
+}
+
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+  background-color: var(--rd-raised) !important;
+  color: var(--rd-text-primary) !important;
+}
+
+.text-muted {
+  color: var(--rd-text-secondary) !important;
+}
+
+.text-secondary {
+  color: var(--rd-text-secondary) !important;
+}
+
+/* Bootstrap form controls on dark */
+.form-control,
+.form-select {
+  background-color: var(--rd-raised);
+  border-color: var(--rd-card-border);
+  color: var(--rd-text-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--rd-raised);
+  border-color: var(--rd-brand);
+  color: var(--rd-text-primary);
+  box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.18);
+}
+
+.form-control::placeholder {
+  color: var(--rd-text-muted);
+}
+
+/* Bootstrap btn-outline-secondary on dark */
+.btn-outline-secondary {
+  color: var(--rd-text-secondary);
+  border-color: var(--rd-card-border);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--rd-raised);
+  border-color: var(--rd-text-secondary);
+  color: var(--rd-text-primary);
+}
+
+/* Progress bar track on dark */
+.progress {
+  background-color: var(--rd-raised);
+}
+
+/* Bootstrap border utilities */
+.border {
+  border-color: var(--rd-card-border) !important;
+}
+
+.border-bottom {
+  border-bottom-color: var(--rd-card-border) !important;
+}
+
+/* ============================================================
+   Brand utilities
+   ============================================================ */
+
+.btn-brand {
+  background: var(--rd-brand);
+  color: #0a0a0f;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-brand:hover {
+  background: var(--rd-brand-dark);
+  color: #0a0a0f;
+}
+
+.text-brand   { color: var(--rd-brand)      !important; }
+.bg-brand     { background: var(--rd-brand) !important; }
+.border-brand { border-color: var(--rd-brand) !important; }
+
+.badge-label {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.progress-bar-brand { background: var(--rd-brand); }
+
+/* ============================================================
+   Shimmer skeleton — dark-adapted
+   ============================================================ */
+
 @keyframes rd-shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* Brand utils */
-.btn-brand { background: var(--rd-brand); color: #fff; border: none; }
-.btn-brand:hover { background: var(--rd-brand-dark); color: #fff; }
-.text-brand { color: var(--rd-brand) !important; }
-.bg-brand { background: var(--rd-brand) !important; }
-.border-brand { border-color: var(--rd-brand) !important; }
-.badge-label { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; }
-.progress-bar-brand { background: var(--rd-brand); }
+.rd-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--rd-raised) 25%,
+    #252535 50%,
+    var(--rd-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: rd-shimmer 1.4s infinite;
+}
 
-/* Sidebar desktop */
-.sidebar { width: 220px; min-height: 100vh; background: var(--rd-sidebar-bg); flex-shrink: 0; }
-.sidebar .nav-link { color: var(--rd-text-muted); border-radius: var(--rd-radius-sm); padding: 10px 12px; font-size: var(--rd-font-size-base); font-weight: 500; }
-.sidebar .nav-link:hover { color: #fff; background: var(--rd-sidebar-hover); }
-.sidebar .nav-link.active { background: var(--rd-brand); color: #fff; }
+/* ============================================================
+   Navigation rail (desktop, md+)
+   64px wide, icon-only, left edge
+   ============================================================ */
 
-/* Mobile top bar */
-.mobile-topbar { background: var(--rd-sidebar-bg); }
+.rd-rail {
+  width: var(--rd-rail-width);
+  min-height: 100vh;
+  background: var(--rd-sidebar-bg);
+  border-right: 1px solid var(--rd-sidebar-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  /* ensure the rail doesn't scroll independently */
+  overflow: visible;
+}
 
-/* Offcanvas mobile nav */
-.offcanvas-nav { width: 240px !important; background: var(--rd-sidebar-bg); }
-.offcanvas-nav .nav-link { color: var(--rd-text-muted); border-radius: var(--rd-radius-sm); padding: 10px 12px; font-size: var(--rd-font-size-base); font-weight: 500; }
-.offcanvas-nav .nav-link:hover { color: #fff; background: var(--rd-sidebar-hover); }
-.offcanvas-nav .nav-link.active { background: var(--rd-brand); color: #fff; }
+.rd-rail-logo {
+  width: var(--rd-rail-width);
+  height: var(--rd-topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--rd-sidebar-border);
+  flex-shrink: 0;
+}
 
-/* KmChart segmented control */
-.rd-segmented { display: flex; background: var(--rd-card-border); border-radius: var(--rd-radius-pill); padding: 3px; gap: 2px; }
+.rd-rail-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0;
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* Each rail item: icon button with tooltip on hover */
+.rd-rail-item {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rd-radius-md);
+  color: var(--rd-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  /* accent bar — hidden by default */
+}
+
+.rd-rail-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 20px;
+  background: var(--rd-brand);
+  border-radius: 0 3px 3px 0;
+  transition: transform 0.15s ease;
+}
+
+.rd-rail-item:hover,
+.rd-rail-item:focus-visible {
+  color: var(--rd-text-primary);
+  background: var(--rd-sidebar-hover);
+  outline: none;
+}
+
+.rd-rail-item.active {
+  color: var(--rd-brand);
+  background: rgba(163, 230, 53, 0.1);
+}
+
+.rd-rail-item.active::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* Floating tooltip on rail item hover */
+.rd-rail-item .rd-rail-tooltip {
+  pointer-events: none;
+  position: absolute;
+  left: calc(var(--rd-rail-width) - 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--rd-raised);
+  color: var(--rd-text-primary);
+  border: 1px solid var(--rd-card-border);
+  border-radius: var(--rd-radius-sm);
+  padding: 4px 10px;
+  font-size: var(--rd-font-size-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--rd-shadow-md);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 200;
+}
+
+.rd-rail-item:hover .rd-rail-tooltip,
+.rd-rail-item:focus-visible .rd-rail-tooltip {
+  opacity: 1;
+}
+
+/* ============================================================
+   Topbar (desktop and mobile)
+   ============================================================ */
+
+.rd-topbar {
+  height: var(--rd-topbar-height);
+  background: var(--rd-topbar-bg);
+  border-bottom: 1px solid var(--rd-topbar-border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--rd-space-lg);
+  gap: var(--rd-space-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.rd-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: var(--rd-font-size-lg);
+  color: var(--rd-text-primary);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.rd-topbar-brand-accent {
+  color: var(--rd-brand);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.rd-topbar-title {
+  font-size: var(--rd-font-size-base);
+  font-weight: 600;
+  color: var(--rd-text-primary);
+  flex-grow: 1;
+}
+
+.rd-topbar-sep {
+  color: var(--rd-text-muted);
+  margin: 0 4px;
+  font-weight: 300;
+}
+
+/* Breadcrumb inside topbar */
+.rd-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--rd-font-size-sm);
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.rd-breadcrumb a {
+  color: var(--rd-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rd-breadcrumb a:hover {
+  color: var(--rd-text-primary);
+}
+
+.rd-breadcrumb-current {
+  color: var(--rd-text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile hamburger button (only visible < md) */
+.rd-hamburger {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--rd-card-border);
+  border-radius: var(--rd-radius-sm);
+  color: var(--rd-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rd-hamburger:hover {
+  background: var(--rd-raised);
+  color: var(--rd-text-primary);
+}
+
+/* Mobile offcanvas nav (replaces existing .offcanvas-nav) */
+.offcanvas-nav {
+  width: 260px !important;
+  background: var(--rd-sidebar-bg) !important;
+  border-right: 1px solid var(--rd-sidebar-border);
+}
+
+.offcanvas-nav .rd-rail-item {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--rd-radius-sm);
+  justify-content: flex-start;
+  padding: 0 12px;
+  gap: 12px;
+}
+
+.offcanvas-nav .rd-rail-item::before {
+  display: none;
+}
+
+.offcanvas-nav .rd-rail-item .rd-rail-tooltip {
+  display: none;
+}
+
+.offcanvas-nav .rd-rail-item-label {
+  font-size: var(--rd-font-size-base);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Bottom tab bar (mobile only, <md)
+   ============================================================ */
+
+.rd-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--rd-tabbar-height);
+  background: var(--rd-tabbar-bg);
+  border-top: 1px solid var(--rd-tabbar-border);
+  display: flex;
+  align-items: stretch;
+  z-index: 200;
+  /* safe area for notch phones */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.rd-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--rd-text-muted);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.rd-tab-item svg,
+.rd-tab-item .rd-tab-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.rd-tab-item.active {
+  color: var(--rd-brand);
+}
+
+.rd-tab-item:hover:not(.active) {
+  color: var(--rd-text-secondary);
+}
+
+/* Push main content above bottom tab bar on mobile */
+@media (max-width: 767.98px) {
+  .rd-main-content {
+    padding-bottom: calc(var(--rd-tabbar-height) + env(safe-area-inset-bottom) + 1rem);
+  }
+}
+
+/* ============================================================
+   Page layout helpers
+   ============================================================ */
+
+.rd-page-bg {
+  background: var(--rd-page-bg);
+  flex-grow: 1;
+}
+
+.rd-main-content {
+  flex-grow: 1;
+  padding: var(--rd-space-lg);
+  background: var(--rd-page-bg);
+  min-height: 0;
+}
+
+@media (max-width: 767.98px) {
+  .rd-main-content {
+    padding: var(--rd-space-md);
+  }
+}
+
+/* Section label: small caps above a group of content */
+.rd-section-label {
+  font-size: var(--rd-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rd-text-muted);
+  margin-bottom: var(--rd-space-sm);
+}
+
+/* ============================================================
+   Stat cards — dark-adapted
+   ============================================================ */
+
+/* Variant borders: a coloured left border replaces the tinted background,
+   which is too subtle in dark mode on dark surfaces. */
+.rd-stat-card {
+  border-left: 3px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.rd-stat-card-orange { border-left-color: var(--rd-brand); }
+.rd-stat-card-green  { border-left-color: var(--rd-elevation); }
+.rd-stat-card-red    { border-left-color: var(--rd-hr); }
+.rd-stat-card-blue   { border-left-color: var(--rd-pace); }
+
+/* ============================================================
+   KmChart segmented control — dark-adapted
+   ============================================================ */
+
+.rd-segmented {
+  display: flex;
+  background: var(--rd-raised);
+  border: 1px solid var(--rd-card-border);
+  border-radius: var(--rd-radius-pill);
+  padding: 3px;
+  gap: 2px;
+}
+
 .rd-segmented-btn {
   border: none;
   border-radius: var(--rd-radius-pill);
@@ -116,9 +608,144 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; f
   transition: all 0.15s ease;
   white-space: nowrap;
 }
+
 .rd-segmented-btn.active {
-  background: #fff;
-  color: var(--rd-text-primary);
-  font-weight: 600;
+  background: var(--rd-brand);
+  color: #0a0a0f;
+  font-weight: 700;
   box-shadow: var(--rd-shadow-sm);
+}
+
+.rd-segmented-btn:hover:not(.active) {
+  color: var(--rd-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   Activity list rows (Recenti)
+   ============================================================ */
+
+.rd-activity-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rd-space-md);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rd-card-border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s ease;
+  border-radius: var(--rd-radius-sm);
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.rd-activity-row:last-child {
+  border-bottom: none;
+}
+
+.rd-activity-row:hover {
+  background: var(--rd-raised);
+}
+
+.rd-activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--rd-radius-sm);
+  background: rgba(163, 230, 53, 0.1);
+  border: 1px solid rgba(163, 230, 53, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.rd-metric-cell {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rd-metric-value {
+  font-size: var(--rd-font-size-sm);
+  font-weight: 600;
+  color: var(--rd-text-primary);
+  line-height: 1.2;
+}
+
+.rd-metric-label {
+  font-size: 0.625rem;
+  color: var(--rd-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+/* ============================================================
+   Shoe progress rows
+   ============================================================ */
+
+.rd-shoe-row {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rd-card-border);
+}
+
+.rd-shoe-row:last-child {
+  border-bottom: none;
+}
+
+/* ============================================================
+   Focus styles — keyboard navigation
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--rd-brand);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Scrollbar — dark-adapted (Webkit)
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--rd-page-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rd-card-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rd-text-muted);
+}
+
+/* ============================================================
+   Recharts overrides — dark-adapted
+   ============================================================ */
+
+.recharts-cartesian-grid-horizontal line {
+  stroke: var(--rd-card-border);
+}
+
+.recharts-text {
+  fill: var(--rd-text-secondary);
+}
+
+.recharts-yAxis .recharts-text {
+  fill: var(--rd-text-muted);
+}
+
+/* ============================================================
+   Utility: mobile-only topbar (legacy class, kept for compat)
+   Now just hides the brand on mobile since topbar shows it
+   ============================================================ */
+.mobile-topbar {
+  background: var(--rd-topbar-bg);
+  border-bottom: 1px solid var(--rd-topbar-border);
 }

@@ -132,21 +132,17 @@ export default function Dashboard() {
 
         <div className="row g-3">
           <div className="col-md-6">
-            <div className="card border bg-light h-100">
+            <div className="card h-100">
               <div className="card-body">
-                <h2 className="h6 fw-semibold mb-3">
-                  <span className="text-brand">🟠</span> Strava Export
-                </h2>
+                <p className="rd-section-label">Strava Export</p>
                 <StravaExportUpload onImport={handleImport} />
               </div>
             </div>
           </div>
           <div className="col-md-6">
-            <div className="card border bg-light h-100">
+            <div className="card h-100">
               <div className="card-body">
-                <h2 className="h6 fw-semibold mb-3">
-                  <span>📂</span> File GPX
-                </h2>
+                <p className="rd-section-label">File GPX</p>
                 <GpxUpload onImport={handleImport} />
               </div>
             </div>
@@ -158,15 +154,11 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* Header */}
+      {/* Page actions bar */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          {greeting && (
-            <p className="text-muted fw-medium small mb-0">{greeting}</p>
-          )}
-          <h1 className="h4 fw-bold mb-0">Dashboard</h1>
-          <p className="text-muted small mb-0">{activities.length} allenamenti totali</p>
-        </div>
+        <p className="text-muted mb-0" style={{ fontSize: 'var(--rd-font-size-sm)' }}>
+          {activities.length} allenamenti totali
+        </p>
         <button
           onClick={() => setShowImport(!showImport)}
           className="btn btn-brand btn-sm d-flex align-items-center gap-2"
@@ -177,15 +169,15 @@ export default function Dashboard() {
 
       {/* Pannello importazione */}
       {showImport && (
-        <div className="card border bg-light mb-4">
+        <div className="card mb-4">
           <div className="card-body">
             <div className="row g-3">
               <div className="col-md-6">
-                <p className="small fw-semibold mb-2">🟠 Strava Export</p>
+                <p className="small fw-semibold mb-2" style={{ color: 'var(--rd-text-secondary)' }}>Strava Export</p>
                 <StravaExportUpload onImport={handleImport} />
               </div>
               <div className="col-md-6">
-                <p className="small fw-semibold mb-2">📂 File GPX</p>
+                <p className="small fw-semibold mb-2" style={{ color: 'var(--rd-text-secondary)' }}>File GPX</p>
                 <GpxUpload onImport={handleImport} />
               </div>
             </div>
@@ -237,9 +229,9 @@ export default function Dashboard() {
           <KmChart activities={activities} />
         </div>
         <div className="col-12 col-xl-4">
-          <div className="card border-0 shadow-sm h-100">
+          <div className="card h-100">
             <div className="card-body">
-              <h2 className="h6 fw-semibold mb-3">Scarpe</h2>
+              <p className="rd-section-label">Scarpe</p>
               {activeShoeStats.length === 0 ? (
                 <p className="text-muted small text-center py-3 mb-0">Importa dati Strava per vedere le scarpe</p>
               ) : (
@@ -248,7 +240,7 @@ export default function Dashboard() {
                     const isWorn = wearPct > 80
                     const remainingKm = Math.max(maxKm - totalKmShoe, 0)
                     const barBg =
-                      wearPct > 80 ? '#dc3545' : wearPct > 60 ? '#ffc107' : '#198754'
+                      wearPct > 80 ? 'var(--rd-danger)' : wearPct > 60 ? 'var(--rd-warning)' : 'var(--rd-success)'
                     return (
                       <div key={shoe.id}>
                         <div className="d-flex align-items-center justify-content-between mb-1">
@@ -283,69 +275,75 @@ export default function Dashboard() {
       </div>
 
       {/* Recent activities */}
-      <div className="card border-0 shadow-sm">
-        <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-          <h2 className="h6 fw-semibold mb-0">Recenti</h2>
-          <Link href="/activities" className="small text-brand fw-medium text-decoration-none">
+      <div className="card">
+        <div className="card-body pt-3 pb-0 px-3 d-flex justify-content-between align-items-center">
+          <p className="rd-section-label mb-0">Recenti</p>
+          <Link href="/activities" className="small text-brand fw-medium text-decoration-none" style={{ fontSize: 'var(--rd-font-size-sm)' }}>
             Tutti →
           </Link>
         </div>
-        <div className="list-group list-group-flush">
+        <div className="card-body p-3 pt-2">
           {activities.slice(0, 6).map((a) => (
             <Link
               key={a.id}
               href={`/activities/${a.id}`}
-              className="list-group-item list-group-item-action px-4 py-3"
+              className="rd-activity-row"
             >
-              <div className="d-flex align-items-center gap-3">
-                {/* Icona tipo attività */}
-                <div
-                  className="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0"
-                  style={{ width: '2.5rem', height: '2.5rem', background: '#fff7ed' }}
-                >
-                  <ActivityTypeIcon type={a.type} />
-                </div>
+              {/* Icon avatar */}
+              <div className="rd-activity-icon" aria-hidden="true">
+                <ActivityTypeIcon type={a.type} />
+              </div>
 
-                {/* Info principale */}
-                <div className="flex-grow-1" style={{ minWidth: 0 }}>
-                  <div className="d-flex align-items-center gap-2">
-                    <p className="fw-semibold small mb-0 text-truncate">{a.name}</p>
-                    {a.label && LABEL_COLORS[a.label] && (
-                      <span
-                        className="badge-label flex-shrink-0"
-                        style={{
-                          backgroundColor: LABEL_COLORS[a.label] + '22',
-                          color: LABEL_COLORS[a.label],
-                          border: `1px solid ${LABEL_COLORS[a.label]}44`,
-                        }}
-                      >
-                        {a.label}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-muted mb-0" style={{ fontSize: '0.75rem' }}>
-                    {formatDate(a.date)}{a.shoe ? ` · ${a.shoe}` : ''}
+              {/* Info principale */}
+              <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                <div className="d-flex align-items-center gap-2">
+                  <p
+                    className="mb-0 text-truncate"
+                    style={{ fontSize: 'var(--rd-font-size-base)', fontWeight: 600, color: 'var(--rd-text-primary)' }}
+                  >
+                    {a.name}
                   </p>
+                  {a.label && LABEL_COLORS[a.label] && (
+                    <span
+                      className="badge-label flex-shrink-0"
+                      style={{
+                        backgroundColor: LABEL_COLORS[a.label] + '22',
+                        color: LABEL_COLORS[a.label],
+                        border: `1px solid ${LABEL_COLORS[a.label]}44`,
+                      }}
+                    >
+                      {a.label}
+                    </span>
+                  )}
                 </div>
+                <p className="mb-0" style={{ fontSize: 'var(--rd-font-size-xs)', color: 'var(--rd-text-muted)' }}>
+                  {formatDate(a.date)}{a.shoe ? ` · ${a.shoe}` : ''}
+                </p>
+              </div>
 
-                {/* Metriche */}
-                <div className="d-flex gap-3 text-end flex-shrink-0">
-                  <div>
-                    <p className="small fw-semibold mb-0">{formatDistance(a.distance)}</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>dist</p>
-                  </div>
-                  <div>
-                    <p className="small fw-semibold mb-0 text-brand">{a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>passo</p>
-                  </div>
-                  <div className="d-none d-sm-block">
-                    <p className="small fw-semibold mb-0 text-danger">{a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>FC</p>
-                  </div>
-                  <div className="d-none d-sm-block">
-                    <p className="small fw-semibold mb-0 text-secondary">{formatDuration(a.duration)}</p>
-                    <p className="text-muted mb-0" style={{ fontSize: '0.7rem' }}>durata</p>
-                  </div>
+              {/* Metriche */}
+              <div className="d-flex gap-3 text-end flex-shrink-0">
+                <div className="rd-metric-cell">
+                  <p className="rd-metric-value mb-0">{formatDistance(a.distance)}</p>
+                  <p className="rd-metric-label mb-0">dist</p>
+                </div>
+                <div className="rd-metric-cell">
+                  <p className="rd-metric-value mb-0" style={{ color: 'var(--rd-brand)' }}>
+                    {a.avgPace ? formatPace(a.avgPace) + '/km' : '—'}
+                  </p>
+                  <p className="rd-metric-label mb-0">passo</p>
+                </div>
+                <div className="rd-metric-cell d-none d-sm-block">
+                  <p className="rd-metric-value mb-0" style={{ color: 'var(--rd-hr)' }}>
+                    {a.avgHeartRate ? Math.round(a.avgHeartRate) + ' bpm' : '—'}
+                  </p>
+                  <p className="rd-metric-label mb-0">FC</p>
+                </div>
+                <div className="rd-metric-cell d-none d-sm-block">
+                  <p className="rd-metric-value mb-0" style={{ color: 'var(--rd-text-secondary)' }}>
+                    {formatDuration(a.duration)}
+                  </p>
+                  <p className="rd-metric-label mb-0">durata</p>
                 </div>
               </div>
             </Link>

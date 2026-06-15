@@ -18,12 +18,16 @@ export interface StatCardProps {
   valueA11y?: string
 }
 
-const VARIANT_MAP: Record<StatCardVariant, { bg: string; border: string }> = {
-  orange:  { bg: 'var(--rd-tint-orange)', border: 'var(--rd-brand-border)' },
-  green:   { bg: 'var(--rd-tint-green)',  border: '#bbf7d0' },
-  red:     { bg: 'var(--rd-tint-red)',    border: '#fecdd3' },
-  blue:    { bg: 'var(--rd-tint-blue)',   border: '#bfdbfe' },
-  neutral: { bg: '#ffffff',              border: 'var(--rd-card-border)' },
+// On the dark theme, instead of tinted backgrounds (too subtle) we use:
+// - a card with var(--rd-card-bg) surface
+// - a 3px left border in the variant color for immediate visual scanning
+// - the value number rendered in the variant color
+const VARIANT_MAP: Record<StatCardVariant, { borderColor: string; valueColor: string }> = {
+  orange:  { borderColor: 'var(--rd-brand)',     valueColor: 'var(--rd-brand)'     },
+  green:   { borderColor: 'var(--rd-elevation)', valueColor: 'var(--rd-elevation)' },
+  red:     { borderColor: 'var(--rd-hr)',         valueColor: 'var(--rd-hr)'        },
+  blue:    { borderColor: 'var(--rd-pace)',        valueColor: 'var(--rd-pace)'      },
+  neutral: { borderColor: 'var(--rd-card-border)', valueColor: 'var(--rd-text-primary)' },
 }
 
 function TrendIndicator({ trend }: { trend: TrendData }) {
@@ -53,13 +57,10 @@ function TrendIndicator({ trend }: { trend: TrendData }) {
 function SkeletonPulse({ width = '60%', height = '1.5rem' }: { width?: string; height?: string }) {
   return (
     <span
-      className="d-inline-block rounded"
+      className="d-inline-block rounded rd-skeleton"
       style={{
         width,
         height,
-        background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)',
-        backgroundSize: '200% 100%',
-        animation: 'rd-shimmer 1.4s infinite',
         verticalAlign: 'middle',
       }}
       aria-hidden="true"
@@ -80,14 +81,15 @@ export function StatCard({
 
   return (
     <article
-      className="card h-100 border"
+      className="card h-100"
       aria-busy={loading}
       aria-label={`${label}: ${valueA11y ?? value}${sub ? '. ' + sub : ''}`}
       style={{
-        background: v.bg,
-        borderColor: v.border,
+        background: 'var(--rd-card-bg)',
+        borderColor: 'var(--rd-card-border)',
         borderRadius: 'var(--rd-radius-md)',
-        boxShadow: 'var(--rd-shadow-card)',
+        borderLeft: `3px solid ${v.borderColor}`,
+        boxShadow: 'none',
       }}
     >
       <div className="card-body p-3">
@@ -96,8 +98,8 @@ export function StatCard({
           aria-hidden="true"
           style={{
             fontSize: 'var(--rd-font-size-xs)',
-            letterSpacing: '0.06em',
-            color: 'var(--rd-text-secondary)',
+            letterSpacing: '0.07em',
+            color: 'var(--rd-text-muted)',
             lineHeight: 1.2,
           }}
         >
@@ -112,9 +114,10 @@ export function StatCard({
             aria-hidden={Boolean(valueA11y)}
             style={{
               fontSize: 'var(--rd-font-size-stat)',
-              color: 'var(--rd-text-primary)',
-              letterSpacing: '-0.02em',
+              color: v.valueColor,
+              letterSpacing: '-0.025em',
               lineHeight: 1.15,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {value}
@@ -124,7 +127,11 @@ export function StatCard({
         {!loading && sub && (
           <p
             className="mb-0"
-            style={{ fontSize: 'var(--rd-font-size-xs)', color: 'var(--rd-text-muted)', marginTop: '2px' }}
+            style={{
+              fontSize: 'var(--rd-font-size-xs)',
+              color: 'var(--rd-text-muted)',
+              marginTop: '3px',
+            }}
           >
             {sub}
           </p>

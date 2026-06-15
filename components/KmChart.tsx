@@ -236,7 +236,7 @@ export function KmChart({ activities }: KmChartProps) {
       <div className="card-body">
         {/* Header */}
         <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2 mb-3">
-          <h2 className="h6 fw-semibold mb-0">Chilometri</h2>
+          <p className="rd-section-label mb-0">Chilometri</p>
 
           {/* Tab selector — segmented pill control */}
           <div className="rd-segmented" role="group" aria-label="Vista chilometri">
@@ -286,13 +286,15 @@ export function KmChart({ activities }: KmChartProps) {
             return (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--rd-card-border)" vertical={false} />
                   <XAxis
                     dataKey="giorno"
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 10, fill: 'var(--rd-text-muted)' }}
+                    axisLine={{ stroke: 'var(--rd-card-border)' }}
+                    tickLine={false}
                     interval={1}
                   />
-                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--rd-text-muted)' }} unit=" km" width={48} axisLine={false} tickLine={false} />
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
@@ -310,9 +312,9 @@ export function KmChart({ activities }: KmChartProps) {
             return (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                  <XAxis dataKey="settimana" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--rd-card-border)" vertical={false} />
+                  <XAxis dataKey="settimana" tick={{ fontSize: 11, fill: 'var(--rd-text-muted)' }} axisLine={{ stroke: 'var(--rd-card-border)' }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--rd-text-muted)' }} unit=" km" width={48} axisLine={false} tickLine={false} />
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
@@ -330,9 +332,9 @@ export function KmChart({ activities }: KmChartProps) {
             return (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={data} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                  <XAxis dataKey="mese" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} unit=" km" width={48} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--rd-card-border)" vertical={false} />
+                  <XAxis dataKey="mese" tick={{ fontSize: 11, fill: 'var(--rd-text-muted)' }} axisLine={{ stroke: 'var(--rd-card-border)' }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--rd-text-muted)' }} unit=" km" width={48} axisLine={false} tickLine={false} />
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <Tooltip content={(props: any) => <CustomTooltip {...props} />} />
                   <Bar dataKey="km" radius={[4, 4, 0, 0]} onClick={handleBarClick} style={{ cursor: 'pointer' }}>
@@ -358,7 +360,7 @@ export function KmChart({ activities }: KmChartProps) {
                     href={`/activities/${a.id}`}
                     className="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-2 px-2"
                   >
-                    <span className="small fw-medium text-dark">
+                    <span className="small fw-medium" style={{ color: 'var(--rd-text-primary)' }}>
                       {a.name}
                     </span>
                     <span className="small text-muted">

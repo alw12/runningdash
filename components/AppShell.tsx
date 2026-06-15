@@ -2,7 +2,9 @@
 
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Sidebar } from './Sidebar'
+import { RailNav } from './RailNav'
+import { BottomTabBar } from './BottomTabBar'
+import { Topbar } from './Topbar'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -14,56 +16,54 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
-      {/* Sidebar desktop - visibile solo md+ */}
-      <div className="sidebar d-none d-md-flex flex-column">
-        <Sidebar />
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        background: 'var(--rd-page-bg)',
+      }}
+    >
+      {/* ── Navigation rail — desktop only (md+) ── */}
+      <div className="d-none d-md-flex">
+        <RailNav />
       </div>
 
-      {/* Overlay mobile */}
-      {mobileOpen && (
-        <div
-          onClick={() => setMobileOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            zIndex: 1049,
-          }}
-        />
-      )}
+      {/* ── Main column: topbar + content ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
 
-      {/* Offcanvas mobile nav */}
-      {mobileOpen && (
-        <div
-          className="offcanvas-nav position-fixed top-0 start-0 h-100 p-3"
-          style={{ zIndex: 1050 }}
-        >
-          <Sidebar onClose={() => setMobileOpen(false)} />
-        </div>
-      )}
-
-      {/* Main content */}
-      <div className="flex-grow-1 d-flex flex-column overflow-auto">
-        {/* Mobile topbar */}
-        <div className="mobile-topbar d-flex d-md-none align-items-center px-3 py-2 sticky-top">
-          <button
-            type="button"
-            className="btn btn-sm text-white me-3"
-            style={{ border: 'none', background: 'transparent', fontSize: '1.4rem' }}
-            onClick={() => setMobileOpen(true)}
-            aria-label="Apri menu"
-          >
-            ☰
-          </button>
-          <span style={{ color: '#fb923c', fontSize: '1.1rem' }}>⬡</span>
-          <span className="text-white fw-bold ms-2">RunDash</span>
-        </div>
+        {/* Topbar — always visible */}
+        <Topbar onHamburger={() => setMobileOpen(true)} />
 
         {/* Page content */}
-        <main className="flex-grow-1 p-3 p-md-4" style={{ background: '#f9fafb' }}>
+        <main className="rd-main-content" style={{ overflowY: 'auto', flex: 1 }}>
           {children}
         </main>
+      </div>
+
+      {/* ── Mobile offcanvas overlay ── */}
+      {mobileOpen && (
+        <>
+          <div
+            onClick={() => setMobileOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.65)',
+              zIndex: 1049,
+            }}
+          />
+          <div
+            className="offcanvas-nav position-fixed top-0 start-0 h-100 p-3"
+            style={{ zIndex: 1050 }}
+          >
+            <RailNav mobile onClose={() => setMobileOpen(false)} />
+          </div>
+        </>
+      )}
+
+      {/* ── Bottom tab bar — mobile only (<md) ── */}
+      <div className="d-md-none">
+        <BottomTabBar />
       </div>
     </div>
   )
