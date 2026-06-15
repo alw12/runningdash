@@ -20,8 +20,8 @@ export function Sidebar({ onClose }: SidebarProps) {
 
   return (
     <div className="d-flex flex-column h-100 w-100">
-      <div className="px-3 py-4" style={{ borderBottom: '1px solid #374151' }}>
-        <span style={{ color: '#fb923c', fontSize: '1.25rem' }}>⬡</span>
+      <div className="px-3 py-4" style={{ borderBottom: '1px solid var(--rd-sidebar-border)' }}>
+        <span style={{ color: 'var(--rd-brand)', fontSize: '1.25rem' }}>⬡</span>
         <span className="text-white fw-bold ms-2 fs-5">RunDash</span>
         {onClose && (
           <button
@@ -49,7 +49,7 @@ export function Sidebar({ onClose }: SidebarProps) {
           )
         })}
       </nav>
-      <div className="px-3 py-3" style={{ borderTop: '1px solid #374151' }}>
+      <div className="px-3 py-3" style={{ borderTop: '1px solid var(--rd-sidebar-border)' }}>
         <small className="text-secondary">RunDash v1.0</small>
       </div>
     </div>

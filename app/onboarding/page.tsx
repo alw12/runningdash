@@ -22,7 +22,7 @@ function Dots({ step, total }: { step: number; total: number }) {
             borderRadius: '9999px',
             transition: 'all 0.3s',
             width: i === step ? '24px' : '6px',
-            backgroundColor: i === step ? '#fb923c' : i < step ? '#fdba74' : '#4b5563',
+            backgroundColor: i === step ? 'var(--rd-brand)' : i < step ? 'var(--rd-brand-dark)' : 'var(--rd-card-border)',
           }}
         />
       ))}
@@ -40,28 +40,28 @@ function Splash({ onNext }: { onNext: () => void }) {
       {/* Logo + title */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div className="d-flex align-items-center justify-content-center gap-3 mb-2">
-          <span style={{ color: '#f97316', fontSize: '3rem', lineHeight: 1 }}>⬡</span>
+          <span style={{ color: 'var(--rd-brand)', fontSize: '3rem', lineHeight: 1 }}>⬡</span>
         </div>
         <h1 className="fw-bold text-white" style={{ fontSize: '3rem', letterSpacing: '-0.025em' }}>
           RunDash
         </h1>
-        <p style={{ color: '#9ca3af', fontSize: '1.125rem', maxWidth: '20rem', margin: '0 auto', lineHeight: 1.6 }}>
+        <p style={{ color: 'var(--rd-text-secondary)', fontSize: '1.125rem', maxWidth: '20rem', margin: '0 auto', lineHeight: 1.6 }}>
           La tua dashboard personale per gli allenamenti di corsa
         </p>
       </div>
 
       {/* Feature bullets */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', color: '#6b7280', maxWidth: '20rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', color: 'var(--rd-text-secondary)', maxWidth: '20rem' }}>
         <div className="d-flex align-items-center gap-3">
-          <span style={{ color: '#f97316', fontSize: '1rem' }}>◆</span>
+          <span style={{ color: 'var(--rd-brand)', fontSize: '1rem' }}>◆</span>
           <span>Zone di passo personalizzate</span>
         </div>
         <div className="d-flex align-items-center gap-3">
-          <span style={{ color: '#f97316', fontSize: '1rem' }}>◉</span>
+          <span style={{ color: 'var(--rd-brand)', fontSize: '1rem' }}>◉</span>
           <span>Tracciamento corse e percorsi GPS</span>
         </div>
         <div className="d-flex align-items-center gap-3">
-          <span style={{ color: '#f97316', fontSize: '1rem' }}>◈</span>
+          <span style={{ color: 'var(--rd-brand)', fontSize: '1rem' }}>◈</span>
           <span>Gestione scarpe e kilometraggio</span>
         </div>
       </div>
@@ -73,10 +73,10 @@ function Splash({ onNext }: { onNext: () => void }) {
           padding: '1rem 2.5rem',
           borderRadius: '1rem',
           fontSize: '1.125rem',
-          backgroundColor: '#f97316',
+          backgroundColor: 'var(--rd-brand)',
           border: 'none',
-          color: '#fff',
-          boxShadow: '0 8px 24px rgba(249,115,22,0.25)',
+          color: 'var(--rd-text-on-brand)',
+          boxShadow: '0 8px 24px rgba(0,229,160,0.25)',
         }}
       >
         Inizia →
@@ -133,9 +133,9 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
     return {
       borderRadius: '0.75rem',
       fontSize: '0.8rem',
-      border: `2px solid ${active ? '#fb923c' : '#4b5563'}`,
-      background: active ? 'rgba(249,115,22,0.15)' : 'transparent',
-      color: active ? '#fdba74' : '#9ca3af',
+      border: `2px solid ${active ? 'var(--rd-brand)' : 'var(--rd-card-border)'}`,
+      background: active ? 'var(--rd-sidebar-active)' : 'transparent',
+      color: active ? 'var(--rd-brand-dark)' : 'var(--rd-text-secondary)',
       transition: 'all 0.2s',
       cursor: 'pointer',
       padding: '0.4rem 0',
@@ -162,22 +162,22 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
       <div className="w-100" style={{ maxWidth: '28rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Header */}
         <div className="text-center" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <p style={{ color: 'var(--rd-brand)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             Passo 1 di 2
           </p>
           <h2 className="fw-bold text-white" style={{ fontSize: '1.5rem' }}>Il tuo profilo fisico</h2>
-          <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Calcoliamo le zone di allenamento ideali per te</p>
+          <p style={{ color: 'var(--rd-text-secondary)', fontSize: '0.875rem' }}>Calcoliamo le zone di allenamento ideali per te</p>
         </div>
 
         {/* Card inputs */}
         <div
           className="card border-secondary"
-          style={{ background: 'rgba(31,41,55,0.6)', backdropFilter: 'blur(8px)', borderRadius: '1rem', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+          style={{ background: 'var(--rd-surface)', backdropFilter: 'blur(8px)', borderRadius: '1rem', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
         >
           {/* Metodo anchor */}
           <div>
             <label
-              style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+              style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
             >
               Metodo di calibrazione
             </label>
@@ -203,7 +203,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           {anchorMethod === 'pace' && (
             <div>
               <label
-                style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+                style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
               >
                 Passo medio (corse facili)
               </label>
@@ -214,14 +214,14 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
                 onChange={e => setReferencePace(e.target.value)}
                 className="form-control"
                 style={{
-                  background: '#374151',
+                  background: 'var(--rd-raised)',
                   color: '#fff',
-                  border: `1px solid ${parsePaceToSeconds(referencePace) !== undefined || referencePace === '' ? '#4b5563' : '#ef4444'}`,
+                  border: `1px solid ${parsePaceToSeconds(referencePace) !== undefined || referencePace === '' ? 'var(--rd-card-border)' : '#ef4444'}`,
                   fontSize: '0.9rem',
                   borderRadius: '0.5rem',
                 }}
               />
-              <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '0.35rem', marginBottom: 0 }}>
+              <p style={{ fontSize: '0.7rem', color: 'var(--rd-text-secondary)', marginTop: '0.35rem', marginBottom: 0 }}>
                 Il tuo passo abituale su corse lente/facili (mm:ss)
               </p>
             </div>
@@ -231,7 +231,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           {anchorMethod === 'hr' && (
             <div>
               <div className="d-flex justify-content-between mb-2">
-                <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <label style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   FC massima
                 </label>
                 <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{maxHR} bpm</span>
@@ -240,9 +240,9 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
                 type="range" min={140} max={220} value={maxHR}
                 onChange={e => setMaxHR(Number(e.target.value))}
                 className="form-range w-100"
-                style={{ accentColor: '#f97316' }}
+                style={{ accentColor: 'var(--rd-brand)' }}
               />
-              <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
+              <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: 'var(--rd-card-border)', marginTop: '0.25rem' }}>
                 <span>140 bpm</span><span>220 bpm</span>
               </div>
             </div>
@@ -251,7 +251,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           {/* Gender */}
           <div>
             <label
-              style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+              style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
             >
               Sesso
             </label>
@@ -264,9 +264,9 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
                   style={{
                     borderRadius: '0.75rem',
                     fontSize: '0.875rem',
-                    border: `2px solid ${gender === v ? '#fb923c' : '#4b5563'}`,
-                    background: gender === v ? 'rgba(249,115,22,0.15)' : 'transparent',
-                    color: gender === v ? '#fdba74' : '#9ca3af',
+                    border: `2px solid ${gender === v ? 'var(--rd-brand)' : 'var(--rd-card-border)'}`,
+                    background: gender === v ? 'var(--rd-sidebar-active)' : 'transparent',
+                    color: gender === v ? 'var(--rd-brand-dark)' : 'var(--rd-text-secondary)',
                     transition: 'all 0.2s',
                     cursor: 'pointer',
                   }}
@@ -280,7 +280,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           {/* Height */}
           <div>
             <div className="d-flex justify-content-between mb-2">
-              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Altezza
               </label>
               <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{height} cm</span>
@@ -289,9 +289,9 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
               type="range" min={140} max={210} value={height}
               onChange={e => setHeight(Number(e.target.value))}
               className="form-range w-100"
-              style={{ accentColor: '#f97316' }}
+              style={{ accentColor: 'var(--rd-brand)' }}
             />
-            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
+            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: 'var(--rd-card-border)', marginTop: '0.25rem' }}>
               <span>140 cm</span><span>210 cm</span>
             </div>
           </div>
@@ -299,7 +299,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           {/* Weight */}
           <div>
             <div className="d-flex justify-content-between mb-2">
-              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <label style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Peso
               </label>
               <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{weight} kg</span>
@@ -308,9 +308,9 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
               type="range" min={40} max={140} value={weight}
               onChange={e => setWeight(Number(e.target.value))}
               className="form-range w-100"
-              style={{ accentColor: '#f97316' }}
+              style={{ accentColor: 'var(--rd-brand)' }}
             />
-            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
+            <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: 'var(--rd-card-border)', marginTop: '0.25rem' }}>
               <span>40 kg</span><span>140 kg</span>
             </div>
           </div>
@@ -319,27 +319,27 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
         {/* Live preview */}
         <div
           style={{
-            background: 'rgba(31,41,55,0.4)',
+            background: 'var(--rd-card-bg)',
             borderRadius: '0.75rem',
-            border: '1px solid #374151',
+            border: '1px solid var(--rd-raised)',
             padding: '1rem',
           }}
         >
-          <p style={{ fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+          <p style={{ fontSize: '0.7rem', color: 'var(--rd-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
             Anteprima zone
           </p>
           <div className="row g-2 text-center">
             <div className="col-6">
-              <p style={{ fontSize: '0.7rem', color: '#6b7280' }}>VO₂max stimato</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--rd-text-secondary)' }}>VO₂max stimato</p>
               <p className="text-white fw-bold" style={{ fontSize: '1.25rem' }}>{result.estimatedVO2max}</p>
-              <p style={{ fontSize: '0.7rem', color: '#4b5563' }}>ml/kg/min</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--rd-card-border)' }}>ml/kg/min</p>
             </div>
             <div className="col-6">
-              <p style={{ fontSize: '0.7rem', color: '#6b7280' }}>Zona aerobica</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--rd-text-secondary)' }}>Zona aerobica</p>
               <p className="fw-bold" style={{ fontSize: '1.25rem', color: '#60a5fa' }}>
                 {formatPace(aero.paceMin)}–{formatPace(aero.paceMax)}
               </p>
-              <p style={{ fontSize: '0.7rem', color: '#4b5563' }}>min/km</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--rd-card-border)' }}>min/km</p>
             </div>
           </div>
         </div>
@@ -348,7 +348,7 @@ function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void
           onClick={handleNext}
           className="btn w-100 fw-semibold"
           style={{
-            backgroundColor: '#f97316',
+            backgroundColor: 'var(--rd-brand)',
             border: 'none',
             color: '#fff',
             padding: '0.875rem',
@@ -396,25 +396,25 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
       <div className="w-100" style={{ maxWidth: '28rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Header */}
         <div className="text-center" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <p style={{ color: '#fb923c', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <p style={{ color: 'var(--rd-brand)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             Passo 2 di 2
           </p>
           <h2 className="fw-bold text-white" style={{ fontSize: '1.5rem' }}>Le tue scarpe</h2>
-          <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>Traccia il kilometraggio di ogni paio</p>
+          <p style={{ color: 'var(--rd-text-secondary)', fontSize: '0.875rem' }}>Traccia il kilometraggio di ogni paio</p>
         </div>
 
         {/* Shoes card */}
         <div
           style={{
-            background: 'rgba(31,41,55,0.6)',
+            background: 'var(--rd-surface)',
             backdropFilter: 'blur(8px)',
             borderRadius: '1rem',
-            border: '1px solid #374151',
+            border: '1px solid var(--rd-raised)',
             overflow: 'hidden',
           }}
         >
           {shoes.length === 0 && !adding && (
-            <div className="text-center px-4 py-5" style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+            <div className="text-center px-4 py-5" style={{ color: 'var(--rd-text-secondary)', fontSize: '0.875rem' }}>
               Nessuna scarpa aggiunta
             </div>
           )}
@@ -423,18 +423,18 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
             <div
               key={s.id}
               className="d-flex align-items-center justify-content-between px-4"
-              style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid #374151' }}
+              style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid var(--rd-raised)' }}
             >
               <div>
                 <p className="text-white fw-medium mb-0" style={{ fontSize: '0.875rem' }}>{s.displayName}</p>
-                <p style={{ color: '#6b7280', fontSize: '0.75rem', marginBottom: 0 }}>{s.brand}</p>
+                <p style={{ color: 'var(--rd-text-secondary)', fontSize: '0.75rem', marginBottom: 0 }}>{s.brand}</p>
               </div>
               <button
                 onClick={() => removeShoe(s.id)}
                 className="btn btn-link p-1"
-                style={{ color: '#4b5563', fontSize: '0.875rem', textDecoration: 'none' }}
+                style={{ color: 'var(--rd-card-border)', fontSize: '0.875rem', textDecoration: 'none' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--rd-card-border)')}
               >
                 ✕
               </button>
@@ -442,7 +442,7 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
           ))}
 
           {adding ? (
-            <div style={{ padding: '1rem', borderTop: '1px solid #374151', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ padding: '1rem', borderTop: '1px solid var(--rd-raised)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div className="row g-2">
                 <div className="col-6">
                   <input
@@ -452,9 +452,9 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
                     onChange={e => setBrand(e.target.value)}
                     className="form-control"
                     style={{
-                      background: '#374151',
+                      background: 'var(--rd-raised)',
                       color: '#fff',
-                      border: '1px solid #4b5563',
+                      border: '1px solid var(--rd-card-border)',
                       fontSize: '0.875rem',
                       borderRadius: '0.5rem',
                     }}
@@ -468,9 +468,9 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
                     onKeyDown={e => e.key === 'Enter' && addShoe()}
                     className="form-control"
                     style={{
-                      background: '#374151',
+                      background: 'var(--rd-raised)',
                       color: '#fff',
-                      border: '1px solid #4b5563',
+                      border: '1px solid var(--rd-card-border)',
                       fontSize: '0.875rem',
                       borderRadius: '0.5rem',
                     }}
@@ -482,7 +482,7 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
                   onClick={addShoe}
                   className="btn flex-fill fw-medium"
                   style={{
-                    backgroundColor: '#f97316',
+                    backgroundColor: 'var(--rd-brand)',
                     border: 'none',
                     color: '#fff',
                     fontSize: '0.875rem',
@@ -495,7 +495,7 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
                 <button
                   onClick={() => { setAdding(false); setBrand(''); setModel('') }}
                   className="btn btn-link px-3"
-                  style={{ color: '#9ca3af', fontSize: '0.875rem', textDecoration: 'none' }}
+                  style={{ color: 'var(--rd-text-secondary)', fontSize: '0.875rem', textDecoration: 'none' }}
                 >
                   Annulla
                 </button>
@@ -506,19 +506,19 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
               onClick={() => setAdding(true)}
               className="btn btn-link w-100 text-start"
               style={{
-                color: '#fb923c',
+                color: 'var(--rd-brand)',
                 fontSize: '0.875rem',
                 padding: '0.875rem 1.25rem',
-                borderTop: shoes.length > 0 ? '1px solid #374151' : 'none',
+                borderTop: shoes.length > 0 ? '1px solid var(--rd-raised)' : 'none',
                 textDecoration: 'none',
                 borderRadius: 0,
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.color = '#fdba74'
+                e.currentTarget.style.color = 'var(--rd-brand-dark)'
                 e.currentTarget.style.background = 'rgba(55,65,81,0.5)'
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.color = '#fb923c'
+                e.currentTarget.style.color = 'var(--rd-brand)'
                 e.currentTarget.style.background = 'transparent'
               }}
             >
@@ -535,13 +535,13 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
             style={{
               padding: '0.875rem',
               borderRadius: '0.75rem',
-              border: '1px solid #4b5563',
-              color: '#9ca3af',
+              border: '1px solid var(--rd-card-border)',
+              color: 'var(--rd-text-secondary)',
               background: 'transparent',
               fontSize: '0.875rem',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.borderColor = '#6b7280' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.borderColor = '#4b5563' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.borderColor = 'var(--rd-text-secondary)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--rd-text-secondary)'; e.currentTarget.style.borderColor = 'var(--rd-card-border)' }}
           >
             Salta
           </button>
@@ -549,7 +549,7 @@ function StepShoes({ onFinish }: { onFinish: (shoes: Shoe[]) => void }) {
             onClick={() => onFinish(shoes)}
             className="btn flex-fill fw-semibold"
             style={{
-              backgroundColor: '#f97316',
+              backgroundColor: 'var(--rd-brand)',
               border: 'none',
               color: '#fff',
               padding: '0.875rem',
@@ -604,7 +604,7 @@ export default function OnboardingPage() {
 
   return (
     <div
-      style={{ background: '#030712', minHeight: '100vh', position: 'fixed', inset: 0, overflowY: 'auto' }}
+      style={{ background: 'var(--rd-page-bg)', minHeight: '100vh', position: 'fixed', inset: 0, overflowY: 'auto' }}
     >
       {/* Ambient gradient blobs */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}>
@@ -616,7 +616,7 @@ export default function OnboardingPage() {
             transform: 'translateX(-50%)',
             width: '24rem',
             height: '24rem',
-            background: 'rgba(249,115,22,0.08)',
+            background: 'rgba(0,229,160,0.08)',
             borderRadius: '9999px',
             filter: 'blur(64px)',
           }}

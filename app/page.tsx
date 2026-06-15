@@ -154,14 +154,15 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* Page actions bar */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <p className="text-muted mb-0" style={{ fontSize: 'var(--rd-font-size-sm)' }}>
-          {activities.length} allenamenti totali
-        </p>
+      {/* Page header */}
+      <div className="rd-page-header">
+        <div>
+          <h1 className="rd-page-title">Dashboard</h1>
+          <p className="rd-page-subtitle">{activities.length} allenamenti totali</p>
+        </div>
         <button
           onClick={() => setShowImport(!showImport)}
-          className="btn btn-brand btn-sm d-flex align-items-center gap-2"
+          className="btn btn-brand btn-sm"
         >
           + Importa
         </button>
@@ -225,10 +226,10 @@ export default function Dashboard() {
 
       {/* Km chart + Scarpe — side-by-side on xl */}
       <div className="row g-3 mb-4">
-        <div className="col-12 col-xl-8">
+        <div className="col-12 col-lg-8">
           <KmChart activities={activities} />
         </div>
-        <div className="col-12 col-xl-4">
+        <div className="col-12 col-lg-4">
           <div className="card h-100">
             <div className="card-body">
               <p className="rd-section-label">Scarpe</p>
@@ -283,7 +284,7 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className="card-body p-3 pt-2">
-          {activities.slice(0, 6).map((a) => (
+          {activities.slice(0, 8).map((a) => (
             <Link
               key={a.id}
               href={`/activities/${a.id}`}

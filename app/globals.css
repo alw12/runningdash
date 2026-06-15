@@ -1,68 +1,73 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* ============================================================
-   RunDash Design System — Dark Theme
-   Palette: Dark base + Acid Lime accent (WHOOP / Garmin style)
+   RunDash Design System — Dark Slate + Signal Green
+   Inspired by WHOOP / Linear / Garmin Connect dark mode.
+
+   Key principles:
+   - Three-level surface hierarchy with visible contrast steps
+   - Single vivid accent (signal green) — not applied to data
+   - Data colors are desaturated enough to coexist without clash
+   - Sidebar (not rail) on desktop: 200px with icon + label
+   - Bottom tab bar on mobile, topbar removed on desktop
    ============================================================ */
 
 :root {
   /* ── Brand ─────────────────────────────────────────────── */
-  --brand:              #a3e635;
-  --brand-dark:         #84cc16;
-  --bs-orange:          #a3e635;
-
-  /* ── Core design tokens ─────────────────────────────────── */
-  --rd-brand:           #a3e635;
-  --rd-brand-dark:      #84cc16;
-  --rd-brand-muted:     #1a2a06;
-  --rd-brand-border:    #3a5a0a;
+  --rd-brand:           #00e5a0;   /* signal green — primary accent */
+  --rd-brand-dark:      #00c488;   /* pressed / hover state         */
+  --rd-brand-muted:     #00251a;   /* tinted background behind brand elements */
+  --rd-brand-border:    #005540;   /* border on brand-tinted surfaces */
 
   /* ── Semantic data colors ────────────────────────────────── */
-  /* Each metric has a distinct hue so charts/cards are scannable */
-  --rd-pace:            #60a5fa;   /* blue-400  */
-  --rd-hr:              #f87171;   /* red-400   */
-  --rd-elevation:       #34d399;   /* emerald-400 */
-  --rd-distance:        #a3e635;   /* lime = brand */
+  /* Desaturated enough to coexist; each has a distinct hue.   */
+  --rd-pace:            #7c9fff;   /* periwinkle — pace/speed   */
+  --rd-hr:              #f47070;   /* soft red — heart rate     */
+  --rd-elevation:       #62e09a;   /* mid-green — elevation     */
+  --rd-distance:        #00e5a0;   /* = brand — distance/km     */
 
-  /* ── Surfaces (dark hierarchy: base → surface → raised) ─── */
-  --rd-page-bg:         #0a0a0f;
-  --rd-surface:         #12121a;
-  --rd-raised:          #1a1a26;
-  --rd-card-bg:         #12121a;
-  --rd-card-border:     #2a2a3a;
+  /* ── Surfaces — three perceivable dark steps ──────────────── */
+  /* Lightness delta between each step: ~6-8 L* units in OKLCH  */
+  --rd-page-bg:         #111318;   /* base canvas              */
+  --rd-surface:         #191c23;   /* card background          */
+  --rd-raised:          #21252e;   /* hover state / input bg   */
+  --rd-card-bg:         #191c23;
+  --rd-card-border:     #2d3340;   /* border between surfaces  */
+  --rd-card-border-subtle: #232838; /* lighter separator inside cards */
 
-  /* ── Sidebar / rail ─────────────────────────────────────── */
-  --rd-sidebar-bg:      #0d0d15;
-  --rd-sidebar-hover:   #1a1a26;
-  --rd-sidebar-border:  #2a2a3a;
-  --rd-rail-width:      64px;
+  /* ── Sidebar ─────────────────────────────────────────────── */
+  --rd-sidebar-bg:      #13161e;   /* slightly deeper than page-bg */
+  --rd-sidebar-hover:   #1e222c;
+  --rd-sidebar-active:  rgba(0, 229, 160, 0.10);
+  --rd-sidebar-border:  #2a2f3d;
+  --rd-sidebar-width:   200px;     /* wider — shows icon + label   */
 
-  /* ── Topbar ─────────────────────────────────────────────── */
-  --rd-topbar-bg:       #0d0d15;
-  --rd-topbar-border:   #2a2a3a;
-  --rd-topbar-height:   48px;
+  /* ── Topbar (mobile only in the new layout) ─────────────── */
+  --rd-topbar-bg:       #13161e;
+  --rd-topbar-border:   #2a2f3d;
+  --rd-topbar-height:   52px;
 
   /* ── Bottom tab bar (mobile) ────────────────────────────── */
-  --rd-tabbar-bg:       #0d0d15;
-  --rd-tabbar-border:   #2a2a3a;
-  --rd-tabbar-height:   56px;
+  --rd-tabbar-bg:       #13161e;
+  --rd-tabbar-border:   #2a2f3d;
+  --rd-tabbar-height:   58px;
 
-  /* ── Text ───────────────────────────────────────────────── */
-  --rd-text-primary:    #f0f0f5;
-  --rd-text-secondary:  #8888a8;
-  --rd-text-muted:      #55556a;
-  --rd-text-label:      #8888a8;
+  /* ── Text — four levels ──────────────────────────────────── */
+  --rd-text-primary:    #e8eaf2;   /* ~92% white — body text       */
+  --rd-text-secondary:  #7a8099;   /* labels, meta, secondary info */
+  --rd-text-muted:      #484f66;   /* placeholders, disabled       */
+  --rd-text-label:      #7a8099;   /* alias for section labels     */
+  --rd-text-on-brand:   #0a1a14;   /* dark text on brand bg        */
 
   /* ── Status ─────────────────────────────────────────────── */
-  --rd-success:         #4ade80;   /* green-400  */
-  --rd-warning:         #fbbf24;   /* amber-400  */
-  --rd-danger:          #f87171;   /* red-400    */
+  --rd-success:         #4ade80;
+  --rd-warning:         #fbbf24;
+  --rd-danger:          #f87171;
 
-  /* ── Elevation / shadows ─────────────────────────────────── */
-  /* On dark surfaces, shadows are subtler — rely on borders instead */
-  --rd-shadow-sm:       0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --rd-shadow-md:       0 4px 12px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
-  --rd-shadow-card:     0 1px 3px rgba(0,0,0,0.35);
+  /* ── Elevation / shadows ──────────────────────────────────  */
+  --rd-shadow-sm:       0 1px 3px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.3);
+  --rd-shadow-md:       0 4px 16px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35);
+  --rd-shadow-card:     0 1px 4px rgba(0,0,0,0.4);
 
   /* ── Spacing ─────────────────────────────────────────────── */
   --rd-space-xs:        0.25rem;
@@ -75,25 +80,43 @@
   --rd-radius-sm:       6px;
   --rd-radius-md:       10px;
   --rd-radius-lg:       14px;
+  --rd-radius-xl:       20px;
   --rd-radius-pill:     9999px;
 
-  /* ── Typography ─────────────────────────────────────────── */
-  --rd-font-size-xs:    0.6875rem;
-  --rd-font-size-sm:    0.75rem;
-  --rd-font-size-base:  0.875rem;
-  --rd-font-size-lg:    1rem;
-  --rd-font-size-xl:    1.25rem;
-  --rd-font-size-stat:  1.625rem;
+  /* ── Typography ──────────────────────────────────────────── */
+  --rd-font-size-xs:    0.6875rem;  /* 11px */
+  --rd-font-size-sm:    0.75rem;    /* 12px */
+  --rd-font-size-base:  0.875rem;   /* 14px */
+  --rd-font-size-lg:    1rem;       /* 16px */
+  --rd-font-size-xl:    1.25rem;    /* 20px */
+  --rd-font-size-stat:  1.875rem;   /* 30px — bigger than before */
 
-  /* ── Stat card tints (dark-adapted: very low-opacity fills) ─ */
-  --rd-tint-orange:     rgba(163, 230, 53,  0.08);
-  --rd-tint-green:      rgba(52,  211, 153, 0.08);
-  --rd-tint-red:        rgba(248, 113, 113, 0.08);
-  --rd-tint-blue:       rgba(96,  165, 250, 0.08);
+  /* ── Stat card accent colors ─────────────────────────────── */
+  /* Named by role, not colour, to survive palette swaps */
+  --rd-stat-accent-km:    var(--rd-distance);
+  --rd-stat-accent-pace:  var(--rd-pace);
+  --rd-stat-accent-hr:    var(--rd-hr);
+  --rd-stat-accent-elev:  var(--rd-elevation);
+
+  /* ── Tints (8% opacity fills for subtle backgrounds) ─────── */
+  --rd-tint-brand:    rgba(0, 229, 160, 0.08);
+  --rd-tint-pace:     rgba(124, 159, 255, 0.08);
+  --rd-tint-hr:       rgba(244, 112, 112, 0.08);
+  --rd-tint-elev:     rgba(98, 224, 154,  0.08);
+
+  /* ── Legacy aliases (kept so old code doesn't break) ─────── */
+  --rd-rail-width:      var(--rd-sidebar-width);
+  --rd-tint-orange:     var(--rd-tint-brand);
+  --rd-tint-green:      var(--rd-tint-elev);
+  --rd-tint-red:        var(--rd-tint-hr);
+  --rd-tint-blue:       var(--rd-tint-pace);
+
+  /* ── Bootstrap overrides ─────────────────────────────────── */
+  --bs-orange:          var(--rd-brand);
 }
 
 /* ============================================================
-   Base overrides — push Bootstrap's light defaults to dark
+   Base — push Bootstrap's light defaults to dark
    ============================================================ */
 
 html,
@@ -103,13 +126,15 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
   font-size: var(--rd-font-size-base);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Bootstrap's .card, .list-group-item, .card-header all default to white — override globally */
+/* Bootstrap card / list overrides */
 .card {
   background-color: var(--rd-card-bg) !important;
   border-color: var(--rd-card-border) !important;
   color: var(--rd-text-primary);
+  box-shadow: var(--rd-shadow-card);
 }
 
 .card-header {
@@ -138,7 +163,7 @@ body {
   color: var(--rd-text-secondary) !important;
 }
 
-/* Bootstrap form controls on dark */
+/* Form controls */
 .form-control,
 .form-select {
   background-color: var(--rd-raised);
@@ -151,14 +176,14 @@ body {
   background-color: var(--rd-raised);
   border-color: var(--rd-brand);
   color: var(--rd-text-primary);
-  box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.18);
+  box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.16);
 }
 
 .form-control::placeholder {
   color: var(--rd-text-muted);
 }
 
-/* Bootstrap btn-outline-secondary on dark */
+/* btn-outline-secondary on dark */
 .btn-outline-secondary {
   color: var(--rd-text-secondary);
   border-color: var(--rd-card-border);
@@ -170,18 +195,19 @@ body {
   color: var(--rd-text-primary);
 }
 
-/* Progress bar track on dark */
+/* Progress bar track */
 .progress {
   background-color: var(--rd-raised);
 }
 
-/* Bootstrap border utilities */
+/* Border utilities */
 .border {
   border-color: var(--rd-card-border) !important;
 }
 
-.border-bottom {
-  border-bottom-color: var(--rd-card-border) !important;
+.border-bottom,
+.border-top {
+  border-color: var(--rd-card-border) !important;
 }
 
 /* ============================================================
@@ -190,24 +216,28 @@ body {
 
 .btn-brand {
   background: var(--rd-brand);
-  color: #0a0a0f;
+  color: var(--rd-text-on-brand);
   border: none;
   font-weight: 600;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-brand:hover {
+.btn-brand:hover,
+.btn-brand:focus-visible {
   background: var(--rd-brand-dark);
-  color: #0a0a0f;
+  color: var(--rd-text-on-brand);
+  box-shadow: 0 0 0 3px rgba(0, 229, 160, 0.24);
 }
 
 .text-brand   { color: var(--rd-brand)      !important; }
 .bg-brand     { background: var(--rd-brand) !important; }
 .border-brand { border-color: var(--rd-brand) !important; }
 
+/* Small pill badge */
 .badge-label {
   font-size: 0.68rem;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--rd-radius-pill);
   font-weight: 500;
 }
 
@@ -225,41 +255,160 @@ body {
 .rd-skeleton {
   background: linear-gradient(
     90deg,
-    var(--rd-raised) 25%,
-    #252535 50%,
-    var(--rd-raised) 75%
+    var(--rd-raised)  25%,
+    #2a3044           50%,
+    var(--rd-raised)  75%
   );
   background-size: 200% 100%;
   animation: rd-shimmer 1.4s infinite;
 }
 
 /* ============================================================
-   Navigation rail (desktop, md+)
-   64px wide, icon-only, left edge
+   Sidebar — desktop (md+)
+   200px wide with icon + label. Replaces the 64px icon-only rail.
    ============================================================ */
 
-.rd-rail {
-  width: var(--rd-rail-width);
+.rd-sidebar {
+  width: var(--rd-sidebar-width);
   min-height: 100vh;
   background: var(--rd-sidebar-bg);
   border-right: 1px solid var(--rd-sidebar-border);
   display: flex;
   flex-direction: column;
-  align-items: center;
   flex-shrink: 0;
-  padding: 0;
   position: sticky;
   top: 0;
-  /* ensure the rail doesn't scroll independently */
+  overflow: visible;
+}
+
+/* Logo zone */
+.rd-sidebar-logo {
+  height: var(--rd-topbar-height);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--rd-space-md);
+  border-bottom: 1px solid var(--rd-sidebar-border);
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.rd-sidebar-logo-mark {
+  color: var(--rd-brand);
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rd-sidebar-logo-text {
+  font-weight: 700;
+  font-size: var(--rd-font-size-lg);
+  color: var(--rd-text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Nav container */
+.rd-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px;
+  flex-grow: 1;
+}
+
+/* Each sidebar nav item */
+.rd-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--rd-radius-md);
+  color: var(--rd-text-secondary);
+  text-decoration: none;
+  font-size: var(--rd-font-size-base);
+  font-weight: 500;
+  transition: color 0.14s ease, background 0.14s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* Active indicator: left accent bar + tinted bg */
+.rd-sidebar-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 20px;
+  background: var(--rd-brand);
+  border-radius: 0 3px 3px 0;
+  transition: transform 0.14s ease;
+}
+
+.rd-sidebar-item:hover,
+.rd-sidebar-item:focus-visible {
+  color: var(--rd-text-primary);
+  background: var(--rd-sidebar-hover);
+  outline: none;
+}
+
+.rd-sidebar-item.active {
+  color: var(--rd-brand);
+  background: var(--rd-sidebar-active);
+  font-weight: 600;
+}
+
+.rd-sidebar-item.active::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.rd-sidebar-item-icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.rd-sidebar-item.active .rd-sidebar-item-icon {
+  opacity: 1;
+}
+
+/* Sidebar footer */
+.rd-sidebar-footer {
+  padding: 12px var(--rd-space-md);
+  border-top: 1px solid var(--rd-sidebar-border);
+  color: var(--rd-text-muted);
+  font-size: var(--rd-font-size-xs);
+}
+
+/* ============================================================
+   Legacy rail classes — map to sidebar equivalents
+   (so RailNav.tsx keeps working without JSX changes)
+   ============================================================ */
+
+.rd-rail {
+  width: var(--rd-sidebar-width);
+  min-height: 100vh;
+  background: var(--rd-sidebar-bg);
+  border-right: 1px solid var(--rd-sidebar-border);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
   overflow: visible;
 }
 
 .rd-rail-logo {
-  width: var(--rd-rail-width);
   height: var(--rd-topbar-height);
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 0 var(--rd-space-md);
   border-bottom: 1px solid var(--rd-sidebar-border);
   flex-shrink: 0;
 }
@@ -267,29 +416,32 @@ body {
 .rd-rail-nav {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 2px;
-  padding: 8px 0;
+  padding: 12px 8px;
   flex-grow: 1;
   width: 100%;
 }
 
-/* Each rail item: icon button with tooltip on hover */
+/* Rail item — now shows icon + label on the wider sidebar */
 .rd-rail-item {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 100%;
+  height: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 0 10px;
   border-radius: var(--rd-radius-md);
-  color: var(--rd-text-muted);
+  color: var(--rd-text-secondary);
   text-decoration: none;
-  transition: color 0.15s ease, background 0.15s ease;
+  font-size: var(--rd-font-size-base);
+  font-weight: 500;
+  transition: color 0.14s ease, background 0.14s ease;
   cursor: pointer;
   border: none;
   background: transparent;
-  /* accent bar — hidden by default */
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .rd-rail-item::before {
@@ -302,7 +454,7 @@ body {
   height: 20px;
   background: var(--rd-brand);
   border-radius: 0 3px 3px 0;
-  transition: transform 0.15s ease;
+  transition: transform 0.14s ease;
 }
 
 .rd-rail-item:hover,
@@ -314,41 +466,28 @@ body {
 
 .rd-rail-item.active {
   color: var(--rd-brand);
-  background: rgba(163, 230, 53, 0.1);
+  background: var(--rd-sidebar-active);
+  font-weight: 600;
 }
 
 .rd-rail-item.active::before {
   transform: translateY(-50%) scaleY(1);
 }
 
-/* Floating tooltip on rail item hover */
-.rd-rail-item .rd-rail-tooltip {
-  pointer-events: none;
-  position: absolute;
-  left: calc(var(--rd-rail-width) - 8px);
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--rd-raised);
-  color: var(--rd-text-primary);
-  border: 1px solid var(--rd-card-border);
-  border-radius: var(--rd-radius-sm);
-  padding: 4px 10px;
-  font-size: var(--rd-font-size-sm);
-  font-weight: 500;
-  white-space: nowrap;
-  box-shadow: var(--rd-shadow-md);
-  opacity: 0;
-  transition: opacity 0.12s ease;
-  z-index: 200;
+/* Rail item label — always visible now (sidebar is 200px) */
+.rd-rail-item-label {
+  font-size: var(--rd-font-size-base);
+  font-weight: inherit;
 }
 
-.rd-rail-item:hover .rd-rail-tooltip,
-.rd-rail-item:focus-visible .rd-rail-tooltip {
-  opacity: 1;
+/* Tooltip suppressed on desktop (label is always visible) */
+.rd-rail-tooltip {
+  display: none;
 }
 
 /* ============================================================
-   Topbar (desktop and mobile)
+   Topbar — mobile only in the new layout (<md)
+   Desktop topbar is replaced by the sidebar logo zone.
    ============================================================ */
 
 .rd-topbar {
@@ -357,8 +496,8 @@ body {
   border-bottom: 1px solid var(--rd-topbar-border);
   display: flex;
   align-items: center;
-  padding: 0 var(--rd-space-lg);
-  gap: var(--rd-space-md);
+  padding: 0 var(--rd-space-md);
+  gap: var(--rd-space-sm);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -382,11 +521,15 @@ body {
   line-height: 1;
 }
 
+/* Page title in topbar (mobile: replaces logo on sub-pages) */
 .rd-topbar-title {
-  font-size: var(--rd-font-size-base);
+  font-size: var(--rd-font-size-lg);
   font-weight: 600;
   color: var(--rd-text-primary);
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rd-topbar-sep {
@@ -395,7 +538,7 @@ body {
   font-weight: 300;
 }
 
-/* Breadcrumb inside topbar */
+/* Breadcrumb inside topbar — desktop only */
 .rd-breadcrumb {
   display: flex;
   align-items: center;
@@ -409,6 +552,7 @@ body {
   color: var(--rd-text-secondary);
   text-decoration: none;
   white-space: nowrap;
+  transition: color 0.14s ease;
 }
 
 .rd-breadcrumb a:hover {
@@ -423,10 +567,10 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Mobile hamburger button (only visible < md) */
+/* Hamburger — mobile only */
 .rd-hamburger {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,37 +589,15 @@ body {
   color: var(--rd-text-primary);
 }
 
-/* Mobile offcanvas nav (replaces existing .offcanvas-nav) */
+/* Mobile offcanvas overlay */
 .offcanvas-nav {
-  width: 260px !important;
+  width: 240px !important;
   background: var(--rd-sidebar-bg) !important;
   border-right: 1px solid var(--rd-sidebar-border);
 }
 
-.offcanvas-nav .rd-rail-item {
-  width: 100%;
-  height: 44px;
-  border-radius: var(--rd-radius-sm);
-  justify-content: flex-start;
-  padding: 0 12px;
-  gap: 12px;
-}
-
-.offcanvas-nav .rd-rail-item::before {
-  display: none;
-}
-
-.offcanvas-nav .rd-rail-item .rd-rail-tooltip {
-  display: none;
-}
-
-.offcanvas-nav .rd-rail-item-label {
-  font-size: var(--rd-font-size-base);
-  font-weight: 500;
-}
-
 /* ============================================================
-   Bottom tab bar (mobile only, <md)
+   Bottom tab bar — mobile only (<md)
    ============================================================ */
 
 .rd-tabbar {
@@ -489,8 +611,10 @@ body {
   display: flex;
   align-items: stretch;
   z-index: 200;
-  /* safe area for notch phones */
   padding-bottom: env(safe-area-inset-bottom);
+  /* Frosted look — browser support permitting */
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
 }
 
 .rd-tab-item {
@@ -499,25 +623,37 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   text-decoration: none;
   color: var(--rd-text-muted);
   font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.02em;
-  transition: color 0.15s ease;
+  transition: color 0.14s ease;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   background: transparent;
   border: none;
   padding: 0;
+  position: relative;
+}
+
+/* Active pill indicator above icon */
+.rd-tab-item.active::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  width: 20px;
+  height: 2px;
+  background: var(--rd-brand);
+  border-radius: var(--rd-radius-pill);
 }
 
 .rd-tab-item svg,
 .rd-tab-item .rd-tab-icon {
   font-size: 1.25rem;
   line-height: 1;
-  transition: color 0.15s ease;
+  transition: color 0.14s ease;
 }
 
 .rd-tab-item.active {
@@ -531,12 +667,12 @@ body {
 /* Push main content above bottom tab bar on mobile */
 @media (max-width: 767.98px) {
   .rd-main-content {
-    padding-bottom: calc(var(--rd-tabbar-height) + env(safe-area-inset-bottom) + 1rem);
+    padding-bottom: calc(var(--rd-tabbar-height) + env(safe-area-inset-bottom) + var(--rd-space-md));
   }
 }
 
 /* ============================================================
-   Page layout helpers
+   Page layout
    ============================================================ */
 
 .rd-page-bg {
@@ -549,6 +685,7 @@ body {
   padding: var(--rd-space-lg);
   background: var(--rd-page-bg);
   min-height: 0;
+  max-width: 1400px;  /* prevent content from stretching on ultrawide */
 }
 
 @media (max-width: 767.98px) {
@@ -557,34 +694,55 @@ body {
   }
 }
 
-/* Section label: small caps above a group of content */
+/* Page title — h1 inside pages */
+.rd-page-title {
+  font-size: 1.375rem;  /* 22px */
+  font-weight: 700;
+  color: var(--rd-text-primary);
+  letter-spacing: -0.025em;
+  margin-bottom: var(--rd-space-xs);
+  line-height: 1.2;
+}
+
+/* Subtitle under page title */
+.rd-page-subtitle {
+  font-size: var(--rd-font-size-sm);
+  color: var(--rd-text-secondary);
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* Section label: clear, readable — not tiny uppercase */
 .rd-section-label {
-  font-size: var(--rd-font-size-xs);
+  font-size: var(--rd-font-size-sm);   /* 12px — up from 11px */
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--rd-text-muted);
+  color: var(--rd-text-secondary);     /* brighter than before */
   margin-bottom: var(--rd-space-sm);
 }
 
 /* ============================================================
-   Stat cards — dark-adapted
+   Stat cards — signal green palette
    ============================================================ */
 
-/* Variant borders: a coloured left border replaces the tinted background,
-   which is too subtle in dark mode on dark surfaces. */
 .rd-stat-card {
   border-left: 3px solid transparent;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.rd-stat-card-orange { border-left-color: var(--rd-brand); }
-.rd-stat-card-green  { border-left-color: var(--rd-elevation); }
-.rd-stat-card-red    { border-left-color: var(--rd-hr); }
-.rd-stat-card-blue   { border-left-color: var(--rd-pace); }
+.rd-stat-card:hover {
+  box-shadow: var(--rd-shadow-sm);
+}
+
+/* Map old colour names to new semantic tokens */
+.rd-stat-card-orange { border-left-color: var(--rd-stat-accent-km);   }
+.rd-stat-card-green  { border-left-color: var(--rd-stat-accent-pace);  }
+.rd-stat-card-red    { border-left-color: var(--rd-stat-accent-hr);    }
+.rd-stat-card-blue   { border-left-color: var(--rd-stat-accent-elev);  }
 
 /* ============================================================
-   KmChart segmented control — dark-adapted
+   KmChart segmented control
    ============================================================ */
 
 .rd-segmented {
@@ -605,13 +763,13 @@ body {
   background: transparent;
   color: var(--rd-text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.14s ease, color 0.14s ease;
   white-space: nowrap;
 }
 
 .rd-segmented-btn.active {
   background: var(--rd-brand);
-  color: #0a0a0f;
+  color: var(--rd-text-on-brand);
   font-weight: 700;
   box-shadow: var(--rd-shadow-sm);
 }
@@ -629,15 +787,13 @@ body {
   display: flex;
   align-items: center;
   gap: var(--rd-space-md);
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rd-card-border);
+  padding: 11px 8px;
+  border-bottom: 1px solid var(--rd-card-border-subtle);
   text-decoration: none;
   color: inherit;
   transition: background 0.12s ease;
   border-radius: var(--rd-radius-sm);
   margin: 0 -8px;
-  padding-left: 8px;
-  padding-right: 8px;
 }
 
 .rd-activity-row:last-child {
@@ -648,12 +804,13 @@ body {
   background: var(--rd-raised);
 }
 
+/* Activity type avatar */
 .rd-activity-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--rd-radius-sm);
-  background: rgba(163, 230, 53, 0.1);
-  border: 1px solid rgba(163, 230, 53, 0.2);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-tint-brand);
+  border: 1px solid var(--rd-brand-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -671,6 +828,7 @@ body {
   font-weight: 600;
   color: var(--rd-text-primary);
   line-height: 1.2;
+  font-variant-numeric: tabular-nums;
 }
 
 .rd-metric-label {
@@ -687,7 +845,7 @@ body {
 
 .rd-shoe-row {
   padding: 10px 0;
-  border-bottom: 1px solid var(--rd-card-border);
+  border-bottom: 1px solid var(--rd-card-border-subtle);
 }
 
 .rd-shoe-row:last-child {
@@ -695,7 +853,7 @@ body {
 }
 
 /* ============================================================
-   Focus styles — keyboard navigation
+   Focus styles — keyboard navigation (WCAG 2.4.11)
    ============================================================ */
 
 :focus-visible {
@@ -704,7 +862,7 @@ body {
 }
 
 /* ============================================================
-   Scrollbar — dark-adapted (Webkit)
+   Scrollbar — dark-adapted (WebKit)
    ============================================================ */
 
 ::-webkit-scrollbar {
@@ -742,10 +900,42 @@ body {
 }
 
 /* ============================================================
-   Utility: mobile-only topbar (legacy class, kept for compat)
-   Now just hides the brand on mobile since topbar shows it
+   Utility: mobile-only topbar (legacy class)
    ============================================================ */
+
 .mobile-topbar {
   background: var(--rd-topbar-bg);
   border-bottom: 1px solid var(--rd-topbar-border);
+}
+
+/* ============================================================
+   Page header block — use inside each page above the content
+   <div class="rd-page-header"> <h1 class="rd-page-title">...
+   ============================================================ */
+
+.rd-page-header {
+  margin-bottom: var(--rd-space-lg);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--rd-space-md);
+}
+
+@media (max-width: 575.98px) {
+  .rd-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--rd-space-sm);
+    margin-bottom: var(--rd-space-md);
+  }
+}
+
+/* ============================================================
+   Divider utility inside cards
+   ============================================================ */
+
+.rd-divider {
+  border: none;
+  border-top: 1px solid var(--rd-card-border-subtle);
+  margin: 0;
 }
