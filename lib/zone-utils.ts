@@ -17,10 +17,16 @@ const WALK_FALLBACK = 510 // s/km (8:30/km)
 let _cachedVVO2maxPace: number | null = null
 
 function vVO2maxPace(): number | null {
+  if (typeof window === 'undefined') return null
   if (_cachedVVO2maxPace !== null) return _cachedVVO2maxPace
   const p = getProfile()
   if (!p) return null
-  const result = calculatePaceZones(p.heightCm, p.weightKg, p.gender)
+  const result = calculatePaceZones(p.heightCm, p.weightKg, p.gender, {
+    anchorMethod: p.anchorMethod,
+    referencePaceSeconds: p.referencePaceSeconds,
+    maxHR: p.maxHR,
+    bodyFatPct: p.bodyFatPct,
+  })
   _cachedVVO2maxPace = result.vVO2maxPace
   return _cachedVVO2maxPace
 }

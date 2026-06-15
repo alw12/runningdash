@@ -1,11 +1,12 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { saveProfile } from '@/lib/user-profile'
+import { saveProfile, AnchorMethod } from '@/lib/user-profile'
+import { invalidateZoneCache } from '@/lib/zone-utils'
 import { getShoes, saveShoes } from '@/lib/storage'
 import { Shoe } from '@/types'
 import { formatPace } from '@/lib/utils'
-import { calculatePaceZones } from '@/lib/pace-calc'
+import { calculatePaceZones, CalculateOptions } from '@/lib/pace-calc'
 
 const ONBOARDED_KEY = 'rd_onboarded_v1'
 
@@ -84,14 +85,74 @@ function Splash({ onNext }: { onNext: () => void }) {
   )
 }
 
+// ─── Helper: parse "mm:ss" → seconds (undefined se non valido) ───────────────
+function parsePaceToSeconds(pace: string): number | undefined {
+  const parts = pace.split(':')
+  if (parts.length !== 2) return undefined
+  const m = parseInt(parts[0], 10)
+  const s = parseInt(parts[1], 10)
+  if (isNaN(m) || isNaN(s) || m < 0 || s < 0 || s >= 60) return undefined
+  const total = m * 60 + s
+  if (total <= 0) return undefined
+  return total
+}
+
 // ─── Step 1: Calculator profile ─────────────────────────────────────────────
-function StepCalculator({ onNext }: { onNext: (h: number, w: number, g: 'm' | 'f') => void }) {
+interface CalcNextPayload {
+  h: number
+  w: number
+  g: 'm' | 'f'
+  anchorMethod: AnchorMethod
+  referencePaceSeconds?: number
+  maxHR?: number
+}
+
+function StepCalculator({ onNext }: { onNext: (payload: CalcNextPayload) => void }) {
   const [height, setHeight] = useState(175)
   const [weight, setWeight] = useState(70)
   const [gender, setGender] = useState<'m' | 'f'>('m')
 
-  const result = calculatePaceZones(height, weight, gender)
+  // Anchor method
+  const [anchorMethod, setAnchorMethod] = useState<AnchorMethod>('anthropometric')
+  const [referencePace, setReferencePace] = useState('')
+  const [maxHR, setMaxHR] = useState(185)
+
+  // Build options for live preview
+  const options: CalculateOptions =
+    anchorMethod === 'pace'
+      ? { anchorMethod: 'pace', referencePaceSeconds: parsePaceToSeconds(referencePace) }
+      : anchorMethod === 'hr'
+      ? { anchorMethod: 'hr', maxHR }
+      : { anchorMethod: 'anthropometric' }
+
+  const result = calculatePaceZones(height, weight, gender, options)
   const aero = result.zones[1]
+
+  // Stile bottone metodo anchor (riusa palette bottoni gender)
+  function methodBtnStyle(active: boolean) {
+    return {
+      borderRadius: '0.75rem',
+      fontSize: '0.8rem',
+      border: `2px solid ${active ? '#fb923c' : '#4b5563'}`,
+      background: active ? 'rgba(249,115,22,0.15)' : 'transparent',
+      color: active ? '#fdba74' : '#9ca3af',
+      transition: 'all 0.2s',
+      cursor: 'pointer',
+      padding: '0.4rem 0',
+    } as React.CSSProperties
+  }
+
+  function handleNext() {
+    const payload: CalcNextPayload = {
+      h: height,
+      w: weight,
+      g: gender,
+      anchorMethod,
+      referencePaceSeconds: anchorMethod === 'pace' ? parsePaceToSeconds(referencePace) : undefined,
+      maxHR: anchorMethod === 'hr' ? maxHR : undefined,
+    }
+    onNext(payload)
+  }
 
   return (
     <div
@@ -113,6 +174,80 @@ function StepCalculator({ onNext }: { onNext: (h: number, w: number, g: 'm' | 'f
           className="card border-secondary"
           style={{ background: 'rgba(31,41,55,0.6)', backdropFilter: 'blur(8px)', borderRadius: '1rem', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
         >
+          {/* Metodo anchor */}
+          <div>
+            <label
+              style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+            >
+              Metodo di calibrazione
+            </label>
+            <div className="d-flex gap-2">
+              {([
+                ['anthropometric', 'Corporeo'],
+                ['pace',           'Passo reale'],
+                ['hr',             'FC max'],
+              ] as [AnchorMethod, string][]).map(([v, l]) => (
+                <button
+                  key={v}
+                  onClick={() => setAnchorMethod(v)}
+                  className="flex-fill fw-semibold"
+                  style={methodBtnStyle(anchorMethod === v)}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Input condizionale per metodo pace */}
+          {anchorMethod === 'pace' && (
+            <div>
+              <label
+                style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}
+              >
+                Passo medio (corse facili)
+              </label>
+              <input
+                type="text"
+                placeholder="es. 7:49 min/km"
+                value={referencePace}
+                onChange={e => setReferencePace(e.target.value)}
+                className="form-control"
+                style={{
+                  background: '#374151',
+                  color: '#fff',
+                  border: `1px solid ${parsePaceToSeconds(referencePace) !== undefined || referencePace === '' ? '#4b5563' : '#ef4444'}`,
+                  fontSize: '0.9rem',
+                  borderRadius: '0.5rem',
+                }}
+              />
+              <p style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '0.35rem', marginBottom: 0 }}>
+                Il tuo passo abituale su corse lente/facili (mm:ss)
+              </p>
+            </div>
+          )}
+
+          {/* Input condizionale per metodo hr */}
+          {anchorMethod === 'hr' && (
+            <div>
+              <div className="d-flex justify-content-between mb-2">
+                <label style={{ fontSize: '0.7rem', fontWeight: 500, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  FC massima
+                </label>
+                <span className="text-white fw-bold" style={{ fontSize: '0.875rem' }}>{maxHR} bpm</span>
+              </div>
+              <input
+                type="range" min={140} max={220} value={maxHR}
+                onChange={e => setMaxHR(Number(e.target.value))}
+                className="form-range w-100"
+                style={{ accentColor: '#f97316' }}
+              />
+              <div className="d-flex justify-content-between" style={{ fontSize: '0.7rem', color: '#4b5563', marginTop: '0.25rem' }}>
+                <span>140 bpm</span><span>220 bpm</span>
+              </div>
+            </div>
+          )}
+
           {/* Gender */}
           <div>
             <label
@@ -210,7 +345,7 @@ function StepCalculator({ onNext }: { onNext: (h: number, w: number, g: 'm' | 'f
         </div>
 
         <button
-          onClick={() => onNext(height, weight, gender)}
+          onClick={handleNext}
           className="btn w-100 fw-semibold"
           style={{
             backgroundColor: '#f97316',
@@ -436,17 +571,25 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0)
 
   // Saved between steps
-  const [profile, setProfile] = useState<{ h: number; w: number; g: 'm' | 'f' } | null>(null)
+  const [profile, setProfile] = useState<CalcNextPayload | null>(null)
 
-  function handleCalcNext(h: number, w: number, g: 'm' | 'f') {
-    setProfile({ h, w, g })
+  function handleCalcNext(payload: CalcNextPayload) {
+    setProfile(payload)
     setStep(2)
   }
 
   function handleShoesFinish(shoes: Shoe[]) {
     // Persist profile
     if (profile) {
-      saveProfile({ heightCm: profile.h, weightKg: profile.w, gender: profile.g })
+      saveProfile({
+        heightCm: profile.h,
+        weightKg: profile.w,
+        gender: profile.g,
+        anchorMethod: profile.anchorMethod,
+        referencePaceSeconds: profile.referencePaceSeconds,
+        maxHR: profile.maxHR,
+      })
+      invalidateZoneCache()
     }
     // Persist shoes (merge with any existing)
     if (shoes.length > 0) {
